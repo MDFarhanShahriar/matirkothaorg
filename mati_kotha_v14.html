@@ -1088,6 +1088,9 @@ function showPage(name) {
 
 // ── INIT — load Sheets data then render ──
 (async () => {
+  // Restore cart count from localStorage immediately on load
+  updateCartCount();
+
   // Show loading state while fetching
   ['featuredProducts','allProducts'].forEach(id => {
     const el = document.getElementById(id);
