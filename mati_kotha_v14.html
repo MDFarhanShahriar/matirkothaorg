@@ -1010,10 +1010,7 @@ async function placeOrder() {
     zone:     selectedZone.label,
     promo:    appliedPromo || '',
     subtotal, discount, delivery, codFee, total,
-    items: cart.map(i => ({
-      id: i.id, name: i.name, price: i.price, qty: i.qty,
-      lineTotal: i.price * i.qty
-    }))
+    items: cart.map(i => ({ id: i.id, qty: i.qty }))
   });
 
   document.getElementById('orderIdDisplay').textContent = orderId;
