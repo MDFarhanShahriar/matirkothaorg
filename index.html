@@ -303,6 +303,80 @@ footer {
 .modal-tag { display: inline-block; background: var(--clay-light); color: var(--clay-dark); padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; margin-bottom: 1rem; }
 .modal-cta { margin-top: 1.5rem; text-align: center; padding-top: 1rem; border-top: 1px solid var(--clay-light); }
 .modal-cta a { color: var(--clay); font-weight: 700; text-decoration: none; }
+
+/* ── ORDER TRACKING ── */
+.tracking-page { max-width: 680px; margin: 0 auto; padding: 2rem; }
+.tracking-search {
+  background: white; border-radius: 16px; padding: 1.8rem;
+  box-shadow: 0 2px 12px rgba(61,35,20,0.08); margin-bottom: 1.5rem;
+}
+.tracking-search h3 { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--earth); margin-bottom:0.4rem; }
+.tracking-search p { font-size:0.85rem; color:#7a5a45; margin-bottom:1.4rem; }
+.track-btn {
+  width:100%; padding:13px; background:var(--clay); color:white;
+  border:none; border-radius:10px; font-family:'Hind Siliguri',sans-serif;
+  font-size:1rem; font-weight:700; cursor:pointer; margin-top:0.5rem; transition:background 0.2s;
+}
+.track-btn:hover { background:var(--clay-dark); }
+.track-btn:disabled { background:#aaa; cursor:not-allowed; }
+
+/* Result card */
+.track-result { background:white; border-radius:16px; padding:1.8rem; box-shadow:0 2px 12px rgba(61,35,20,0.08); }
+.track-order-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.8rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--clay-light); }
+.track-order-id { font-size:0.78rem; color:#7a5a45; margin-bottom:2px; }
+.track-order-id strong { font-size:1.1rem; color:var(--earth); font-family:'Playfair Display',serif; }
+.track-status-badge {
+  padding:6px 16px; border-radius:20px; font-size:0.82rem; font-weight:700;
+}
+
+/* Progress bar */
+.progress-wrap { margin-bottom:1.8rem; }
+.progress-steps { display:flex; justify-content:space-between; position:relative; margin-bottom:0.5rem; }
+.progress-steps::before {
+  content:''; position:absolute; top:18px; left:10%; right:10%; height:4px;
+  background:var(--clay-light); z-index:0; border-radius:4px;
+}
+.progress-line {
+  position:absolute; top:18px; left:10%; height:4px;
+  background:var(--clay); z-index:1; border-radius:4px; transition:width 0.6s ease;
+}
+.progress-step { display:flex; flex-direction:column; align-items:center; z-index:2; flex:1; }
+.step-dot {
+  width:36px; height:36px; border-radius:50%; border:3px solid var(--clay-light);
+  background:white; display:flex; align-items:center; justify-content:center;
+  font-size:1rem; margin-bottom:6px; transition:all 0.3s;
+}
+.step-dot.done { background:var(--clay); border-color:var(--clay); }
+.step-dot.active { background:var(--gold); border-color:var(--gold); animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(212,168,83,0.4)} 50%{box-shadow:0 0 0 8px rgba(212,168,83,0)} }
+.step-label { font-size:0.68rem; color:#7a5a45; text-align:center; font-weight:600; max-width:60px; line-height:1.3; }
+.step-label.active { color:var(--clay-dark); font-weight:700; }
+.step-label.done { color:var(--sage); }
+
+/* Details */
+.track-details { background:var(--cream); border-radius:12px; padding:1.2rem; margin-bottom:1rem; }
+.track-detail-row { display:flex; justify-content:space-between; padding:5px 0; font-size:0.88rem; border-bottom:1px solid var(--clay-light); }
+.track-detail-row:last-child { border:none; }
+.track-detail-label { color:#7a5a45; font-weight:600; }
+.track-detail-value { font-weight:600; color:var(--earth); text-align:right; }
+
+/* Courier tracking */
+.courier-box {
+  background:linear-gradient(135deg, var(--earth), var(--clay-dark));
+  border-radius:12px; padding:1.2rem; color:white; display:flex;
+  align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.8rem;
+}
+.courier-box h4 { font-size:0.85rem; opacity:0.8; margin-bottom:3px; }
+.courier-box .tracking-no { font-size:1.1rem; font-weight:700; letter-spacing:1px; font-family:monospace; }
+.copy-tracking-btn {
+  background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.4);
+  color:white; padding:8px 16px; border-radius:8px; cursor:pointer;
+  font-family:'Hind Siliguri',sans-serif; font-size:0.85rem; font-weight:700;
+  transition:background 0.2s; white-space:nowrap;
+}
+.copy-tracking-btn:hover { background:rgba(255,255,255,0.35); }
+.track-error { text-align:center; padding:2rem; color:#c0392b; font-weight:600; }
+
 /* ── PRODUCT POPUP MODAL ── */
 .pmod-overlay {
   display: none; position: fixed; inset: 0; z-index: 9500;
@@ -360,6 +434,7 @@ footer {
   <ul class="nav-links">
     <li><a onclick="showPage('home')">হোম</a></li>
     <li><a onclick="showPage('catalog')">পণ্য দেখুন</a></li>
+    <li><a onclick="showPage('tracking')">অর্ডার ট্র্যাক</a></li>
     <li><a onclick="showPage('contact')">যোগাযোগ</a></li>
   </ul>
   <div class="nav-right">
@@ -483,6 +558,40 @@ footer {
   </div>
 </div>
 
+
+<!-- ═══ ORDER TRACKING PAGE ═══ -->
+<div class="page" id="page-tracking">
+  <div class="section-head">
+    <div class="tag">অর্ডার ট্র্যাকিং</div>
+    <h2>আপনার অর্ডার কোথায়?</h2>
+  </div>
+  <div class="tracking-page">
+
+    <!-- Search box -->
+    <div class="tracking-search">
+      <h3>🔍 অর্ডার খুঁজুন</h3>
+      <p>অর্ডার আইডি এবং মোবাইল নম্বর দিয়ে আপনার অর্ডারের বর্তমান অবস্থান জানুন</p>
+      <div class="form-group">
+        <label>অর্ডার আইডি *</label>
+        <input type="text" id="trackOrderId" placeholder="যেমন: MC-123456"
+          style="width:100%;padding:11px 14px;border:2px solid var(--clay-light);border-radius:10px;font-family:'Hind Siliguri',sans-serif;font-size:1rem;outline:none;text-transform:uppercase"
+          onfocus="this.style.borderColor='var(--clay)'" onblur="this.style.borderColor='var(--clay-light)'"
+          oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div class="form-group">
+        <label>মোবাইল নম্বর *</label>
+        <input type="tel" id="trackPhone" placeholder="01XXXXXXXXX"
+          style="width:100%;padding:11px 14px;border:2px solid var(--clay-light);border-radius:10px;font-family:'Hind Siliguri',sans-serif;font-size:1rem;outline:none"
+          onfocus="this.style.borderColor='var(--clay)'" onblur="this.style.borderColor='var(--clay-light)'">
+      </div>
+      <button class="track-btn" id="trackSearchBtn" onclick="trackOrder()">🔍 অর্ডার খুঁজুন</button>
+    </div>
+
+    <!-- Result -->
+    <div id="trackResult" style="display:none"></div>
+  </div>
+</div>
+
 <!-- ═══ CONTACT PAGE ═══ -->
 <div class="page" id="page-contact">
   <div class="contact-page">
@@ -572,6 +681,7 @@ footer {
         <li><a onclick="showPage('home')">হোম</a></li>
         <li><a onclick="showPage('catalog')">পণ্য দেখুন</a></li>
             <li><a onclick="showPage('cart')">কার্ট</a></li>
+        <li><a onclick="showPage('tracking')">অর্ডার ট্র্যাক</a></li>
         <li><a onclick="showPage('contact')">যোগাযোগ</a></li>
       </ul>
     </div>
@@ -596,7 +706,7 @@ footer {
 // ════════════════════════════════════════════════════════════
 //  ⚙️  GOOGLE SHEETS CONFIG — replace URL after deploying
 // ════════════════════════════════════════════════════════════
-const API_URL = 'https://script.google.com/macros/s/AKfycbx0epEZjAoz-fUUHiNuptYd6JDNB_A9DrrDS_72b9qVulBrypYAQXbAsr4-42rEluQaZg/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxyiAwDNyQfbKa1rBp8ccovvTdiam6EhOZjtO2pg7e1xj8Fm3JS7ONwMetqDloOCfHq6Q/exec';
 // How to get this URL:
 //  1. Open your Google Sheet → Extensions → Apps Script
 //  2. Paste the code from Code.gs (the other file)
@@ -1040,6 +1150,175 @@ function showPage(name) {
   if (name === 'order') renderOrderSummary();
   if (name === 'catalog') renderProducts('allProducts', products);
 }
+
+
+// ════════════════════════════════════════════════
+// ── ORDER TRACKING ──
+// ════════════════════════════════════════════════
+const STATUS_STEPS = [
+  { key:'নতুন',              icon:'📋', label:'অর্ডার হয়েছে' },
+  { key:'নিশ্চিত',           icon:'✅', label:'নিশ্চিত হয়েছে' },
+  { key:'প্রস্তুত',          icon:'📦', label:'প্যাক হয়েছে' },
+  { key:'পাঠানো হয়েছে',     icon:'🚚', label:'পাঠানো হয়েছে' },
+  { key:'সম্পন্ন',           icon:'🎉', label:'পৌঁছে গেছে' },
+];
+
+const STATUS_COLORS = {
+  'নতুন':            { bg:'#e8f4fd', color:'#2980b9' },
+  'নিশ্চিত':         { bg:'#eaf0d8', color:'#5d6e52' },
+  'প্রস্তুত':        { bg:'#fff8e8', color:'#d4a853' },
+  'পাঠানো হয়েছে':   { bg:'#fde8d8', color:'#c2714f' },
+  'সম্পন্ন':         { bg:'#d8f5e8', color:'#27ae60' },
+  'বাতিল':           { bg:'#fde8e8', color:'#c0392b' },
+};
+
+async function trackOrder() {
+  const orderId = document.getElementById('trackOrderId').value.trim().toUpperCase();
+  const phone   = document.getElementById('trackPhone').value.trim();
+  const btn     = document.getElementById('trackSearchBtn');
+  const result  = document.getElementById('trackResult');
+
+  if (!orderId || !phone) { showToast('অর্ডার আইডি ও মোবাইল নম্বর দিন!'); return; }
+
+  btn.disabled = true; btn.textContent = '⏳ খোঁজা হচ্ছে...';
+  result.style.display = 'none';
+
+  try {
+    const data = await apiGet(`trackOrder&orderId=${encodeURIComponent(orderId)}&phone=${encodeURIComponent(phone)}`);
+    result.style.display = 'block';
+
+    if (!data.success || !data.order) {
+      result.innerHTML = `<div class="track-result"><div class="track-error">❌ অর্ডার পাওয়া যায়নি।<br><small>অর্ডার আইডি ও মোবাইল নম্বর সঠিক কিনা দেখুন।</small></div></div>`;
+    } else {
+      result.innerHTML = buildTrackingResult(data.order);
+    }
+  } catch(e) {
+    result.style.display = 'block';
+    result.innerHTML = `<div class="track-result"><div class="track-error">❌ সংযোগ সমস্যা হয়েছে। আবার চেষ্টা করুন।</div></div>`;
+  }
+
+  btn.disabled = false; btn.textContent = '🔍 অর্ডার খুঁজুন';
+}
+
+function buildTrackingResult(o) {
+  const status      = o.status || 'নতুন';
+  const isCancelled = status === 'বাতিল';
+  const statusColor = STATUS_COLORS[status] || { bg:'#f0f0f0', color:'#333' };
+
+  // Progress bar
+  const currentIdx = STATUS_STEPS.findIndex(s => s.key === status);
+  const progressPct = isCancelled ? 0 : Math.max(0, (currentIdx / (STATUS_STEPS.length - 1)) * 80);
+
+  const stepsHTML = STATUS_STEPS.map((s, i) => {
+    const isDone   = !isCancelled && i < currentIdx;
+    const isActive = !isCancelled && i === currentIdx;
+    return `
+      <div class="progress-step">
+        <div class="step-dot ${isDone?'done':''} ${isActive?'active':''}">${isDone?'✓':s.icon}</div>
+        <div class="step-label ${isDone?'done':''} ${isActive?'active':''}">${s.label}</div>
+      </div>`;
+  }).join('');
+
+  const progressBar = isCancelled ? '' : `
+    <div class="progress-wrap">
+      <div class="progress-steps">
+        <div class="progress-line" style="width:${progressPct}%"></div>
+        ${stepsHTML}
+      </div>
+    </div>`;
+
+  // Courier tracking box
+  const courierHTML = (o.courier_tracking && o.courier_tracking.toString().trim())
+    ? `<div class="courier-box">
+        <div>
+          <h4>🚚 কুরিয়ার ট্র্যাকিং নম্বর</h4>
+          <div class="tracking-no" id="courierTrackNo">${o.courier_tracking}</div>
+          ${o.courier_name ? `<div style="font-size:0.78rem;opacity:0.7;margin-top:2px">${o.courier_name}</div>` : ''}
+        </div>
+        <button class="copy-tracking-btn" onclick="copyCourierTracking()">📋 কপি করুন</button>
+      </div>`
+    : '';
+
+  // Parse items
+  let itemsHTML = '';
+  try {
+    const items = typeof o.items_json === 'string' ? JSON.parse(o.items_json) : o.items_json;
+    if (Array.isArray(items) && items.length) {
+      itemsHTML = `<div class="track-detail-row">
+        <span class="track-detail-label">পণ্য</span>
+        <span class="track-detail-value">${items.map(i => `id:${i.id} ×${i.qty}`).join(', ')}</span>
+      </div>`;
+    }
+  } catch(e) {}
+
+  return `
+    <div class="track-result">
+      <div class="track-order-header">
+        <div>
+          <div class="track-order-id">অর্ডার আইডি</div>
+          <div class="track-order-id"><strong>${o.order_id}</strong></div>
+          <div style="font-size:0.78rem;color:#7a5a45;margin-top:3px">📅 ${o.date || ''}</div>
+        </div>
+        <div class="track-status-badge" style="background:${statusColor.bg};color:${statusColor.color}">
+          ${status}
+        </div>
+      </div>
+
+      ${progressBar}
+
+      ${isCancelled ? '<div style="text-align:center;padding:1rem;color:#c0392b;font-weight:600;background:#fde8e8;border-radius:10px;margin-bottom:1rem">❌ এই অর্ডারটি বাতিল করা হয়েছে</div>' : ''}
+
+      <div class="track-details">
+        <div class="track-detail-row">
+          <span class="track-detail-label">নাম</span>
+          <span class="track-detail-value">${o.name || ''}</span>
+        </div>
+        <div class="track-detail-row">
+          <span class="track-detail-label">ডেলিভারি এলাকা</span>
+          <span class="track-detail-value">${o.zone || ''}</span>
+        </div>
+        <div class="track-detail-row">
+          <span class="track-detail-label">পেমেন্ট পদ্ধতি</span>
+          <span class="track-detail-value">${o.payment || ''}</span>
+        </div>
+        ${itemsHTML}
+        <div class="track-detail-row">
+          <span class="track-detail-label">মোট পরিশোধ</span>
+          <span class="track-detail-value" style="color:var(--clay);font-size:1rem">৳${o.total || 0}</span>
+        </div>
+      </div>
+
+      ${courierHTML}
+    </div>`;
+}
+
+function copyCourierTracking() {
+  const no  = document.getElementById('courierTrackNo')?.textContent?.trim();
+  const btn = event.target;
+  if (!no) return;
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(no).then(() => flashCopyBtn(btn));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = no; ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    flashCopyBtn(btn);
+  }
+}
+
+function flashCopyBtn(btn) {
+  btn.textContent = '✅ কপি হয়েছে!';
+  setTimeout(() => btn.textContent = '📋 কপি করুন', 2000);
+}
+
+// Allow Enter key in tracking inputs
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (document.activeElement.id === 'trackOrderId' || document.activeElement.id === 'trackPhone')) {
+    trackOrder();
+  }
+});
 
 // ── INIT — load Sheets data then render ──
 (async () => {
@@ -1628,6 +1907,80 @@ footer {
 .modal-tag { display: inline-block; background: var(--clay-light); color: var(--clay-dark); padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; margin-bottom: 1rem; }
 .modal-cta { margin-top: 1.5rem; text-align: center; padding-top: 1rem; border-top: 1px solid var(--clay-light); }
 .modal-cta a { color: var(--clay); font-weight: 700; text-decoration: none; }
+
+/* ── ORDER TRACKING ── */
+.tracking-page { max-width: 680px; margin: 0 auto; padding: 2rem; }
+.tracking-search {
+  background: white; border-radius: 16px; padding: 1.8rem;
+  box-shadow: 0 2px 12px rgba(61,35,20,0.08); margin-bottom: 1.5rem;
+}
+.tracking-search h3 { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--earth); margin-bottom:0.4rem; }
+.tracking-search p { font-size:0.85rem; color:#7a5a45; margin-bottom:1.4rem; }
+.track-btn {
+  width:100%; padding:13px; background:var(--clay); color:white;
+  border:none; border-radius:10px; font-family:'Hind Siliguri',sans-serif;
+  font-size:1rem; font-weight:700; cursor:pointer; margin-top:0.5rem; transition:background 0.2s;
+}
+.track-btn:hover { background:var(--clay-dark); }
+.track-btn:disabled { background:#aaa; cursor:not-allowed; }
+
+/* Result card */
+.track-result { background:white; border-radius:16px; padding:1.8rem; box-shadow:0 2px 12px rgba(61,35,20,0.08); }
+.track-order-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.8rem; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:2px solid var(--clay-light); }
+.track-order-id { font-size:0.78rem; color:#7a5a45; margin-bottom:2px; }
+.track-order-id strong { font-size:1.1rem; color:var(--earth); font-family:'Playfair Display',serif; }
+.track-status-badge {
+  padding:6px 16px; border-radius:20px; font-size:0.82rem; font-weight:700;
+}
+
+/* Progress bar */
+.progress-wrap { margin-bottom:1.8rem; }
+.progress-steps { display:flex; justify-content:space-between; position:relative; margin-bottom:0.5rem; }
+.progress-steps::before {
+  content:''; position:absolute; top:18px; left:10%; right:10%; height:4px;
+  background:var(--clay-light); z-index:0; border-radius:4px;
+}
+.progress-line {
+  position:absolute; top:18px; left:10%; height:4px;
+  background:var(--clay); z-index:1; border-radius:4px; transition:width 0.6s ease;
+}
+.progress-step { display:flex; flex-direction:column; align-items:center; z-index:2; flex:1; }
+.step-dot {
+  width:36px; height:36px; border-radius:50%; border:3px solid var(--clay-light);
+  background:white; display:flex; align-items:center; justify-content:center;
+  font-size:1rem; margin-bottom:6px; transition:all 0.3s;
+}
+.step-dot.done { background:var(--clay); border-color:var(--clay); }
+.step-dot.active { background:var(--gold); border-color:var(--gold); animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(212,168,83,0.4)} 50%{box-shadow:0 0 0 8px rgba(212,168,83,0)} }
+.step-label { font-size:0.68rem; color:#7a5a45; text-align:center; font-weight:600; max-width:60px; line-height:1.3; }
+.step-label.active { color:var(--clay-dark); font-weight:700; }
+.step-label.done { color:var(--sage); }
+
+/* Details */
+.track-details { background:var(--cream); border-radius:12px; padding:1.2rem; margin-bottom:1rem; }
+.track-detail-row { display:flex; justify-content:space-between; padding:5px 0; font-size:0.88rem; border-bottom:1px solid var(--clay-light); }
+.track-detail-row:last-child { border:none; }
+.track-detail-label { color:#7a5a45; font-weight:600; }
+.track-detail-value { font-weight:600; color:var(--earth); text-align:right; }
+
+/* Courier tracking */
+.courier-box {
+  background:linear-gradient(135deg, var(--earth), var(--clay-dark));
+  border-radius:12px; padding:1.2rem; color:white; display:flex;
+  align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.8rem;
+}
+.courier-box h4 { font-size:0.85rem; opacity:0.8; margin-bottom:3px; }
+.courier-box .tracking-no { font-size:1.1rem; font-weight:700; letter-spacing:1px; font-family:monospace; }
+.copy-tracking-btn {
+  background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.4);
+  color:white; padding:8px 16px; border-radius:8px; cursor:pointer;
+  font-family:'Hind Siliguri',sans-serif; font-size:0.85rem; font-weight:700;
+  transition:background 0.2s; white-space:nowrap;
+}
+.copy-tracking-btn:hover { background:rgba(255,255,255,0.35); }
+.track-error { text-align:center; padding:2rem; color:#c0392b; font-weight:600; }
+
 /* ── PRODUCT POPUP MODAL ── */
 .pmod-overlay {
   display: none; position: fixed; inset: 0; z-index: 9500;
