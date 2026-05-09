@@ -465,6 +465,26 @@ footer {
 .cod-box h3 { font-size: 1rem; font-weight: 700; color: var(--earth); margin-bottom: 0.5rem; }
 .cod-box p { font-size: 0.85rem; color: #7a5a45; line-height: 1.6; }
 
+
+/* ── ORDER HISTORY ── */
+.history-page { max-width: 680px; margin: 0 auto; padding: 2rem; }
+.history-search { background:white; border-radius:16px; padding:1.6rem; box-shadow:0 2px 12px rgba(61,35,20,0.08); margin-bottom:1.5rem; }
+.history-search h3 { font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--earth); margin-bottom:0.4rem; }
+.history-search p { font-size:0.85rem; color:#7a5a45; margin-bottom:1.2rem; }
+.history-btn { width:100%; padding:12px; background:var(--clay); color:white; border:none; border-radius:10px; font-family:'Hind Siliguri',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; margin-top:0.5rem; transition:background 0.2s; }
+.history-btn:hover { background:var(--clay-dark); }
+.history-card { background:white; border-radius:14px; padding:1.2rem; box-shadow:0 2px 10px rgba(61,35,20,0.08); margin-bottom:1rem; }
+.history-card-head { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem; padding-bottom:0.8rem; border-bottom:1px solid var(--clay-light); }
+.history-order-id { font-family:monospace; font-weight:700; color:var(--clay-dark); font-size:0.95rem; }
+.history-date { font-size:0.75rem; color:#7a5a45; }
+.history-total { font-size:1rem; font-weight:700; color:var(--clay); }
+.history-actions { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.8rem; }
+.reorder-btn { padding:7px 16px; background:var(--clay); color:white; border:none; border-radius:8px; cursor:pointer; font-family:'Hind Siliguri',sans-serif; font-size:0.82rem; font-weight:700; transition:background 0.2s; }
+.reorder-btn:hover { background:var(--clay-dark); }
+.cancel-order-btn { padding:7px 16px; background:white; color:#c0392b; border:2px solid #c0392b; border-radius:8px; cursor:pointer; font-family:'Hind Siliguri',sans-serif; font-size:0.82rem; font-weight:700; transition:all 0.2s; }
+.cancel-order-btn:hover { background:#c0392b; color:white; }
+.cancel-order-btn:disabled { opacity:0.4; cursor:not-allowed; border-color:#aaa; color:#aaa; }
+
 /* ── PRODUCT POPUP MODAL ── */
 .pmod-overlay {
   display: none; position: fixed; inset: 0; z-index: 9500;
@@ -523,6 +543,7 @@ footer {
     <li><a onclick="showPage('home')">হোম</a></li>
     <li><a onclick="showPage('catalog')">পণ্য দেখুন</a></li>
     <li><a onclick="showPage('tracking')">অর্ডার ট্র্যাক</a></li>
+    <li><a onclick="showPage('history')">অর্ডার ইতিহাস</a></li>
     <li><a onclick="showPage('contact')">যোগাযোগ</a></li>
   </ul>
   <div class="nav-right">
@@ -546,6 +567,7 @@ footer {
     <li><a onclick="showPage('home');closeMobileMenu()">🏠 হোম</a></li>
     <li><a onclick="showPage('catalog');closeMobileMenu()">🏺 পণ্য দেখুন</a></li>
     <li><a onclick="showPage('tracking');closeMobileMenu()">📦 অর্ডার ট্র্যাক</a></li>
+    <li><a onclick="showPage('history');closeMobileMenu()">📋 অর্ডার ইতিহাস</a></li>
     <li><a onclick="showPage('contact');closeMobileMenu()">📞 যোগাযোগ</a></li>
   </ul>
   <button class="mobile-menu-cart" onclick="showPage('cart');closeMobileMenu()">
@@ -678,7 +700,12 @@ footer {
     <p style="margin-top:1rem">আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।</p>
     <p style="margin-top:0.4rem">📞 <strong>01621-978541</strong></p>
     <br>
-    <button class="btn-primary" onclick="showPage('home')" style="font-family:'Hind Siliguri',sans-serif">আবার কেনাকাটা করুন</button>
+    <div style="display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap">
+      <button class="btn-primary" onclick="showPage('home')" style="font-family:'Hind Siliguri',sans-serif">আবার কেনাকাটা করুন</button>
+      <button onclick="showPage('history')" style="background:white;border:2px solid var(--clay);color:var(--clay);padding:13px 28px;border-radius:8px;font-family:'Hind Siliguri',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s"
+        onmouseover="this.style.background='var(--clay)';this.style.color='white'"
+        onmouseout="this.style.background='white';this.style.color='var(--clay)'">📋 অর্ডার দেখুন</button>
+    </div>
   </div>
 </div>
 
@@ -713,6 +740,30 @@ footer {
 
     <!-- Result -->
     <div id="trackResult" style="display:none"></div>
+  </div>
+</div>
+
+
+<!-- ═══ ORDER HISTORY PAGE ═══ -->
+<div class="page" id="page-history">
+  <div class="section-head">
+    <div class="tag">অর্ডার ইতিহাস</div>
+    <h2>আপনার সব অর্ডার</h2>
+  </div>
+  <div class="history-page">
+    <div class="history-search">
+      <h3>📋 অর্ডার ইতিহাস দেখুন</h3>
+      <p>আপনার মোবাইল নম্বর দিয়ে সব অর্ডার দেখুন, পুনরায় অর্ডার করুন বা বাতিল করুন</p>
+      <div class="form-group">
+        <label>মোবাইল নম্বর *</label>
+        <input type="tel" id="historyPhone" placeholder="01XXXXXXXXX"
+          style="width:100%;padding:11px 14px;border:2px solid var(--clay-light);border-radius:10px;font-family:'Hind Siliguri',sans-serif;font-size:1rem;outline:none"
+          onfocus="this.style.borderColor='var(--clay)'" onblur="this.style.borderColor='var(--clay-light)'"
+          onkeydown="if(event.key==='Enter') loadHistory()">
+      </div>
+      <button class="history-btn" id="historySearchBtn" onclick="loadHistory()">📋 ইতিহাস দেখুন</button>
+    </div>
+    <div id="historyResult"></div>
   </div>
 </div>
 
@@ -806,6 +857,7 @@ footer {
         <li><a onclick="showPage('catalog')">পণ্য দেখুন</a></li>
             <li><a onclick="showPage('cart')">কার্ট</a></li>
         <li><a onclick="showPage('tracking')">অর্ডার ট্র্যাক</a></li>
+    <li><a onclick="showPage('history')">অর্ডার ইতিহাস</a></li>
         <li><a onclick="showPage('contact')">যোগাযোগ</a></li>
       </ul>
     </div>
@@ -830,7 +882,7 @@ footer {
 // ════════════════════════════════════════════════════════════
 //  ⚙️  GOOGLE SHEETS CONFIG — replace URL after deploying
 // ════════════════════════════════════════════════════════════
-const API_URL = 'https://script.google.com/macros/s/AKfycbxyiAwDNyQfbKa1rBp8ccovvTdiam6EhOZjtO2pg7e1xj8Fm3JS7ONwMetqDloOCfHq6Q/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbw_Cz3jUyShBeKMmVKLdy2YS4TkWU6kKAxqgFSVLhevrrXp1VziWqPdCgA-5n1nmhX-/exec';
 // How to get this URL:
 //  1. Open your Google Sheet → Extensions → Apps Script
 //  2. Paste the code from Code.gs (the other file)
@@ -1534,6 +1586,16 @@ function buildTrackingResult(o) {
       </div>
 
       ${courierHTML}
+      ${(!isCancelled && currentIdx < 3) ? `
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--clay-light);text-align:center">
+          <button onclick="cancelFromTracking('${o.order_id}', '${o.phone||''}')"
+            style="background:white;border:2px solid #c0392b;color:#c0392b;padding:9px 20px;
+            border-radius:8px;font-family:'Hind Siliguri',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all 0.2s"
+            onmouseover="this.style.background='#c0392b';this.style.color='white'"
+            onmouseout="this.style.background='white';this.style.color='#c0392b'">
+            ✕ অর্ডার বাতিল করুন (৬ ঘণ্টার মধ্যে)
+          </button>
+        </div>` : ''}
     </div>`;
 }
 
@@ -1564,6 +1626,125 @@ document.addEventListener('keydown', e => {
     trackOrder();
   }
 });
+
+
+// ════════════════════════════════════════════════
+// ── ORDER HISTORY ──
+// ════════════════════════════════════════════════
+async function loadHistory() {
+  const phone = document.getElementById('historyPhone')?.value.trim();
+  const btn   = document.getElementById('historySearchBtn');
+  const result = document.getElementById('historyResult');
+  if (!phone) { showToast('মোবাইল নম্বর দিন!'); return; }
+
+  btn.disabled = true; btn.textContent = '⏳ খোঁজা হচ্ছে...';
+  result.innerHTML = '';
+
+  try {
+    const data = await apiGet(`getOrderHistory&phone=${encodeURIComponent(phone)}`);
+    if (!data.success) { result.innerHTML = `<p style="text-align:center;color:#c0392b;padding:2rem">❌ ${data.error}</p>`; return; }
+    if (!data.orders?.length) { result.innerHTML = '<p style="text-align:center;color:#7a5a45;padding:2rem">এই নম্বরে কোনো অর্ডার পাওয়া যায়নি।</p>'; return; }
+
+    result.innerHTML = data.orders.map(o => buildHistoryCard(o, phone)).join('');
+  } catch(e) {
+    result.innerHTML = '<p style="text-align:center;color:#c0392b;padding:2rem">❌ সংযোগ সমস্যা হয়েছে।</p>';
+  }
+  btn.disabled = false; btn.textContent = '📋 ইতিহাস দেখুন';
+}
+
+function buildHistoryCard(o, phone) {
+  const sc = {
+    'নতুন':{bg:'#e8f4fd',color:'#2980b9'}, 'নিশ্চিত':{bg:'#eaf0d8',color:'#5d6e52'},
+    'প্রস্তুত':{bg:'#fff8e8',color:'#b8860b'}, 'পাঠানো হয়েছে':{bg:'#fde8d8',color:'#c2714f'},
+    'সম্পন্ন':{bg:'#d8f5e8',color:'#27ae60'}, 'বাতিল':{bg:'#fde8e8',color:'#c0392b'},
+  }[o.status] || {bg:'#eee',color:'#333'};
+
+  const canCancel = o.status !== 'বাতিল' && o.status !== 'পাঠানো হয়েছে' && o.status !== 'সম্পন্ন';
+
+  // Parse items for reorder
+  let itemsJson = '';
+  try { itemsJson = encodeURIComponent(o.items_json || '[]'); } catch(e) {}
+
+  return `
+    <div class="history-card">
+      <div class="history-card-head">
+        <div>
+          <div class="history-order-id">${o.order_id}</div>
+          <div class="history-date">📅 ${String(o.date||'').substring(0,16)}</div>
+        </div>
+        <div style="text-align:right">
+          <span class="status-badge" style="background:${sc.bg};color:${sc.color}">${o.status||'নতুন'}</span>
+          <div class="history-total">৳${o.total||0}</div>
+        </div>
+      </div>
+      ${o.courier_tracking ? `<div style="font-size:0.8rem;color:#7a5a45;margin-bottom:0.5rem">🚚 ট্র্যাকিং: <strong style="font-family:monospace">${o.courier_tracking}</strong></div>` : ''}
+      <div class="history-actions">
+        <button class="reorder-btn" onclick="reorder('${itemsJson}')">🔄 আবার অর্ডার করুন</button>
+        ${canCancel ? `<button class="cancel-order-btn" id="cancel-${o.order_id}"
+          onclick="cancelOrder('${o.order_id}','${phone}','cancel-${o.order_id}')">
+          ✕ বাতিল করুন
+        </button>` : ''}
+      </div>
+    </div>`;
+}
+
+// ── REORDER ──
+function reorder(itemsJson) {
+  try {
+    const items = JSON.parse(decodeURIComponent(itemsJson));
+    if (!items.length) { showToast('পণ্য তথ্য পাওয়া যায়নি!'); return; }
+    let added = 0;
+    items.forEach(item => {
+      const p = products.find(x => String(x.id) === String(item.id));
+      if (!p || p.stock <= 0) return;
+      const ex = cart.find(x => x.id === p.id);
+      const canAdd = Math.min(item.qty, p.stock - (ex ? ex.qty : 0));
+      if (canAdd <= 0) return;
+      if (ex) ex.qty += canAdd; else cart.push({ ...p, qty: canAdd });
+      added++;
+    });
+    updateCartCount();
+    if (added > 0) { showToast(`✅ ${added}টি পণ্য কার্টে যোগ হয়েছে!`); showPage('cart'); }
+    else showToast('পণ্যগুলো এখন স্টকে নেই!');
+  } catch(e) { showToast('পুনরায় অর্ডার করতে সমস্যা হয়েছে!'); }
+}
+
+// ── CANCEL ORDER ──
+async function cancelOrder(orderId, phone, btnId) {
+  if (!confirm(`অর্ডার "${orderId}" বাতিল করতে চান?`)) return;
+  const btn = document.getElementById(btnId);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ বাতিল হচ্ছে...'; }
+
+  try {
+    const data = await apiPost({ action:'cancelOrder', orderId, phone });
+    if (data.success) {
+      showToast('✅ অর্ডার সফলভাবে বাতিল হয়েছে!');
+      loadHistory(); // refresh list
+    } else {
+      showToast('❌ ' + (data.error || 'বাতিল করা সম্ভব হয়নি।'));
+      if (btn) { btn.disabled = false; btn.textContent = '✕ বাতিল করুন'; }
+    }
+  } catch(e) {
+    showToast('❌ সংযোগ সমস্যা হয়েছে!');
+    if (btn) { btn.disabled = false; btn.textContent = '✕ বাতিল করুন'; }
+  }
+}
+
+// Cancel from tracking page
+async function cancelFromTracking(orderId, phone) {
+  const trackPhone = document.getElementById('trackPhone')?.value.trim() || phone;
+  if (!confirm(`অর্ডার "${orderId}" বাতিল করতে চান?`)) return;
+  try {
+    const data = await apiPost({ action:'cancelOrder', orderId, phone:trackPhone });
+    if (data.success) {
+      showToast('✅ অর্ডার বাতিল হয়েছে!');
+      trackOrder(); // refresh tracking
+    } else {
+      showToast('❌ ' + (data.error || 'বাতিল করা সম্ভব হয়নি।'));
+    }
+  } catch(e) { showToast('❌ সংযোগ সমস্যা!'); }
+}
+
 
 // ── INIT — load Sheets data then render ──
 (async () => {
@@ -2419,6 +2600,26 @@ footer {
 }
 .cod-box h3 { font-size: 1rem; font-weight: 700; color: var(--earth); margin-bottom: 0.5rem; }
 .cod-box p { font-size: 0.85rem; color: #7a5a45; line-height: 1.6; }
+
+
+/* ── ORDER HISTORY ── */
+.history-page { max-width: 680px; margin: 0 auto; padding: 2rem; }
+.history-search { background:white; border-radius:16px; padding:1.6rem; box-shadow:0 2px 12px rgba(61,35,20,0.08); margin-bottom:1.5rem; }
+.history-search h3 { font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--earth); margin-bottom:0.4rem; }
+.history-search p { font-size:0.85rem; color:#7a5a45; margin-bottom:1.2rem; }
+.history-btn { width:100%; padding:12px; background:var(--clay); color:white; border:none; border-radius:10px; font-family:'Hind Siliguri',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; margin-top:0.5rem; transition:background 0.2s; }
+.history-btn:hover { background:var(--clay-dark); }
+.history-card { background:white; border-radius:14px; padding:1.2rem; box-shadow:0 2px 10px rgba(61,35,20,0.08); margin-bottom:1rem; }
+.history-card-head { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem; padding-bottom:0.8rem; border-bottom:1px solid var(--clay-light); }
+.history-order-id { font-family:monospace; font-weight:700; color:var(--clay-dark); font-size:0.95rem; }
+.history-date { font-size:0.75rem; color:#7a5a45; }
+.history-total { font-size:1rem; font-weight:700; color:var(--clay); }
+.history-actions { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.8rem; }
+.reorder-btn { padding:7px 16px; background:var(--clay); color:white; border:none; border-radius:8px; cursor:pointer; font-family:'Hind Siliguri',sans-serif; font-size:0.82rem; font-weight:700; transition:background 0.2s; }
+.reorder-btn:hover { background:var(--clay-dark); }
+.cancel-order-btn { padding:7px 16px; background:white; color:#c0392b; border:2px solid #c0392b; border-radius:8px; cursor:pointer; font-family:'Hind Siliguri',sans-serif; font-size:0.82rem; font-weight:700; transition:all 0.2s; }
+.cancel-order-btn:hover { background:#c0392b; color:white; }
+.cancel-order-btn:disabled { opacity:0.4; cursor:not-allowed; border-color:#aaa; color:#aaa; }
 
 /* ── PRODUCT POPUP MODAL ── */
 .pmod-overlay {
