@@ -205,7 +205,15 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
       <img src="assets/logo.svg" alt="লোগো" onerror="this.style.display='none'">
       মাটির কথা — Admin
     </div>
-    <button class="logout-btn" onclick="doLogout()">🚪 বের হন</button>
+    <div style="display:flex;align-items:center;gap:1rem">
+      <div style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:rgba(255,255,255,0.8)">
+        <div id="pollDot" style="width:8px;height:8px;border-radius:50%;background:#aaa;transition:background 0.3s"></div>
+        <span id="pollLabel">Connecting...</span>
+        <span style="opacity:0.5">|</span>
+        <span id="lastSync" style="font-family:monospace;font-size:0.72rem">—</span>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">🚪 বের হন</button>
+    </div>
   </div>
 
   <div class="admin-body">
@@ -274,9 +282,94 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxyiAwDNyQfbKa1rBp8ccov
 const ADMIN_PASS_KEY = 'matirKothaAdminPass';
 
 // ── STATE ──
-let adminPass   = '';
-let allOrders   = [];
+let adminPass    = '';
+let allOrders    = [];
 let currentOrder = null;
+
+// ════════════════════════════════════════════════
+// REAL-TIME POLLING (every 20 seconds)
+// ════════════════════════════════════════════════
+let adminPollInterval = null;
+let lastOrderCount    = 0;
+let isPolling         = false;
+
+function startAdminPolling() {
+  if (adminPollInterval) clearInterval(adminPollInterval);
+  adminPollInterval = setInterval(silentRefresh, 20000);
+  updatePollIndicator(true);
+}
+
+function stopAdminPolling() {
+  clearInterval(adminPollInterval);
+  adminPollInterval = null;
+  updatePollIndicator(false);
+}
+
+async function silentRefresh() {
+  if (isPolling) return;
+  isPolling = true;
+  try {
+    const res  = await fetch(`${API_URL}?action=adminGetOrders&pass=${encodeURIComponent(adminPass)}`);
+    const data = await res.json();
+    if (!data.success) { isPolling = false; return; }
+
+    const newOrders = data.orders || [];
+    const newCount  = newOrders.length;
+
+    if (newCount > lastOrderCount && lastOrderCount > 0) {
+      const diff = newCount - lastOrderCount;
+      showAdminToast(`🔔 ${diff}টি নতুন অর্ডার এসেছে!`, 'new');
+      playNotifSound();
+    }
+    lastOrderCount = newCount;
+    allOrders = newOrders;
+
+    // Update new order badge
+    document.getElementById('newOrderBadge').textContent =
+      newOrders.filter(o => o.status === 'নতুন').length;
+
+    // Silently re-render active section
+    if (document.getElementById('sec-orders')?.classList.contains('active')) renderOrdersTable();
+    if (document.getElementById('sec-dashboard')?.classList.contains('active')) renderRecentOrders();
+
+    updateLastSyncTime();
+  } catch(e) {}
+  isPolling = false;
+}
+
+function updatePollIndicator(active) {
+  const dot = document.getElementById('pollDot');
+  if (dot) { dot.style.background = active ? '#27ae60' : '#aaa'; }
+  const lbl = document.getElementById('pollLabel');
+  if (lbl) lbl.textContent = active ? 'Live' : 'Paused';
+}
+
+function updateLastSyncTime() {
+  const el = document.getElementById('lastSync');
+  if (el) el.textContent = new Date().toLocaleTimeString('bn-BD');
+}
+
+function playNotifSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const g   = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.setValueAtTime(660, ctx.currentTime + 0.15);
+    g.gain.setValueAtTime(0.25, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    osc.start(); osc.stop(ctx.currentTime + 0.5);
+  } catch(e) {}
+}
+
+function showAdminToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type === 'new' ? '#27ae60' : 'var(--earth)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
 
 const STATUS_COLORS = {
   'নতুন':           { bg:'#e8f4fd', color:'#2980b9' },
@@ -303,8 +396,10 @@ function doLogin() {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('adminApp').style.display = 'block';
         allOrders = data.orders || [];
+        lastOrderCount = allOrders.length;
         loadDashboard();
         renderOrdersTable();
+        startAdminPolling(); // ← start real-time
       } else {
         document.getElementById('loginError').style.display = 'block';
         document.getElementById('loginError').textContent = '❌ ' + (data.error || 'ভুল পাসওয়ার্ড!');
@@ -317,6 +412,7 @@ function doLogin() {
 }
 
 function doLogout() {
+  stopAdminPolling();
   sessionStorage.removeItem(ADMIN_PASS_KEY);
   adminPass = ''; allOrders = [];
   document.getElementById('loginScreen').style.display = 'flex';
@@ -542,9 +638,7 @@ document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); 
 
 // ── TOAST ──
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  showAdminToast(msg, 'normal');
 }
 </script>
 </body>
