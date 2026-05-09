@@ -1580,7 +1580,68 @@ document.addEventListener('keydown', e => {
 
   renderProducts('featuredProducts', products.slice(0, 4));
   renderProducts('allProducts', products);
+
+  // ── REAL-TIME POLLING ──
+  startRealtimeSync();
 })();
+
+// ════════════════════════════════════════════════
+// ── REAL-TIME SYNC (every 30 seconds) ──
+// ════════════════════════════════════════════════
+let syncInterval = null;
+let lastProductHash = '';
+
+function startRealtimeSync() {
+  if (API_URL === 'YOUR_APPS_SCRIPT_DEPLOY_URL_HERE') return; // skip if not configured
+  syncInterval = setInterval(syncProducts, 30000); // every 30s
+}
+
+async function syncProducts() {
+  try {
+    const data = await apiGet('getProducts');
+    if (!data.success || !Array.isArray(data.products)) return;
+
+    // Only update if something changed (compare via simple hash)
+    const newHash = JSON.stringify(data.products.map(p => ({ id:p.id, stock:p.stock, price:p.price, active:p.active })));
+    if (newHash === lastProductHash) return; // no change
+    lastProductHash = newHash;
+
+    // Update products silently
+    const newProducts = data.products
+      .filter(p => String(p.active).toLowerCase() !== 'false' && String(p.active) !== '0')
+      .map(p => ({ ...p, id:Number(p.id), price:Number(p.price), stock:Number(p.stock)||0, badge:p.badge||null }));
+
+    products = newProducts;
+
+    // Re-render current visible grid without disrupting user
+    const featuredEl = document.getElementById('featuredProducts');
+    const allEl      = document.getElementById('allProducts');
+    if (featuredEl && featuredEl.children.length) renderProducts('featuredProducts', products.slice(0,4));
+    if (allEl && allEl.children.length) renderProducts('allProducts', products);
+
+    // Update cart stock warnings if cart is open
+    if (document.getElementById('page-cart')?.classList.contains('active')) renderCart();
+
+    showSyncBadge();
+  } catch(e) {
+    // Silent fail — user not disrupted
+  }
+}
+
+function showSyncBadge() {
+  let badge = document.getElementById('syncBadge');
+  if (!badge) {
+    badge = document.createElement('div');
+    badge.id = 'syncBadge';
+    badge.style.cssText = `position:fixed;bottom:1rem;left:1rem;background:var(--sage);color:white;
+      padding:5px 12px;border-radius:20px;font-size:0.72rem;font-weight:600;z-index:9999;
+      opacity:0;transition:opacity 0.3s;font-family:'Hind Siliguri',sans-serif`;
+    badge.textContent = '✓ আপডেট হয়েছে';
+    document.body.appendChild(badge);
+  }
+  badge.style.opacity = '1';
+  setTimeout(() => badge.style.opacity = '0', 2000);
+}
 
 // ── MODAL CONTENT ──
 const modalContent = {
