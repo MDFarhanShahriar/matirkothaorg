@@ -417,6 +417,54 @@ footer {
 .copy-tracking-btn:hover { background:rgba(255,255,255,0.35); }
 .track-error { text-align:center; padding:2rem; color:#c0392b; font-weight:600; }
 
+
+/* ── PAYMENT INFO BOX ── */
+.payment-box {
+  background: white; border-radius: 16px; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(61,35,20,0.12); text-align: center;
+}
+.payment-box-header {
+  padding: 1rem 1.5rem 0.8rem;
+  border-bottom: 1px solid var(--clay-light);
+}
+.payment-box-header h3 { font-size: 1rem; font-weight: 700; color: var(--earth); margin-bottom: 0.2rem; }
+.payment-box-header p { font-size: 0.82rem; color: #7a5a45; }
+.payment-amount {
+  font-size: 1.5rem; font-weight: 700; color: var(--clay);
+  background: var(--cream); padding: 0.6rem 1rem; margin: 0.8rem 1rem 0;
+  border-radius: 10px; font-family: monospace;
+}
+.payment-number-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0.5rem; padding: 0.6rem 1rem; flex-wrap: wrap;
+}
+.payment-number {
+  font-size: 1.1rem; font-weight: 700; font-family: monospace;
+  color: var(--earth); letter-spacing: 1px;
+}
+.copy-num-btn {
+  background: var(--clay-light); border: none; border-radius: 6px;
+  padding: 4px 10px; cursor: pointer; font-size: 0.78rem; font-weight: 700;
+  color: var(--clay-dark); font-family: 'Hind Siliguri', sans-serif;
+  transition: all 0.2s;
+}
+.copy-num-btn:hover { background: var(--clay); color: white; }
+.payment-qr {
+  width: 180px; height: 180px; object-fit: contain;
+  margin: 0.5rem auto 1rem; display: block; border-radius: 10px;
+  border: 2px solid var(--clay-light);
+}
+.payment-note {
+  background: #fff8e8; border-top: 1px solid var(--gold);
+  padding: 0.7rem 1rem; font-size: 0.78rem; color: #7a5a00;
+}
+.cod-box {
+  background: white; border-radius: 16px; padding: 1.2rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(61,35,20,0.12); text-align: center;
+}
+.cod-box h3 { font-size: 1rem; font-weight: 700; color: var(--earth); margin-bottom: 0.5rem; }
+.cod-box p { font-size: 0.85rem; color: #7a5a45; line-height: 1.6; }
+
 /* ── PRODUCT POPUP MODAL ── */
 .pmod-overlay {
   display: none; position: fixed; inset: 0; z-index: 9500;
@@ -568,6 +616,7 @@ footer {
     <button class="filter-btn" onclick="filterProducts('গ্লাস', this)">গ্লাস</button>
     <button class="filter-btn" onclick="filterProducts('কাস্টম', this)">কাস্টম</button>
     <button class="filter-btn" onclick="filterProducts('সাজসজ্জা', this)">সাজসজ্জা</button>
+    <button class="filter-btn" onclick="filterProducts('পাট', this)">🌿 পাট</button>
   </div>
   <div class="products-grid" id="allProducts"></div>
 </div>
@@ -622,8 +671,12 @@ footer {
         color:var(--clay-dark);font-weight:700;font-family:'Hind Siliguri',sans-serif;
       ">📋 কপি</button>
     </div>
-    <p>আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।</p>
-    <p style="margin-top:0.5rem">📞 <strong>01621-978541</strong></p>
+
+    <!-- Payment info box — shown dynamically -->
+    <div id="paymentInfoBox" style="display:none;width:100%;max-width:400px;margin:1rem auto"></div>
+
+    <p style="margin-top:1rem">আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।</p>
+    <p style="margin-top:0.4rem">📞 <strong>01621-978541</strong></p>
     <br>
     <button class="btn-primary" onclick="showPage('home')" style="font-family:'Hind Siliguri',sans-serif">আবার কেনাকাটা করুন</button>
   </div>
@@ -819,6 +872,34 @@ let cart = JSON.parse(localStorage.getItem('matirKothaCart') || '[]');
 let selectedZone = deliveryZones[0];
 let appliedPromo = null;
 let selectedPayment = 'বিকাশ'; // global payment state
+
+// ── PAYMENT CONFIG — আপনার নম্বর ও QR file path দিন ──
+const PAYMENT_INFO = {
+  'বিকাশ': {
+    number:  '01621-978541',   // আপনার বিকাশ নম্বর
+    type:    'বিকাশ (Personal)',
+    qr:      'assets/qr-bkash.png',   // assets ফোল্ডারে QR ছবির নাম
+    color:   '#E2136E',
+    logo:    '💗',
+    instruction: 'Send Money বা Payment করুন উপরের নম্বরে। Order ID টি Reference এ লিখুন।',
+  },
+  'নগদ': {
+    number:  '01965-169833',   // আপনার নগদ নম্বর
+    type:    'নগদ (Personal)',
+    qr:      'assets/qr-nagad.png',
+    color:   '#F15A24',
+    logo:    '🟠',
+    instruction: 'Send Money করুন উপরের নম্বরে। Order ID টি Reference এ লিখুন।',
+  },
+  'রকেট': {
+    number:  '01919-5372199', // আপনার রকেট নম্বর (শেষে অতিরিক্ত ডিজিট)
+    type:    'রকেট (Personal)',
+    qr:      'assets/qr-rocket.png',
+    color:   '#8B008B',
+    logo:    '🚀',
+    instruction: 'Send Money করুন উপরের নম্বরে। Order ID টি Reference এ লিখুন।',
+  },
+};
 
 // ════════════════════════════════════════════════════════════
 //  🌐  API HELPERS
@@ -1040,13 +1121,35 @@ function renderCart() {
   const promoHTML = `
     <div class="promo-section">
       <h4>🏷️ প্রোমো কোড আছে?</h4>
-      <div class="promo-row">
-        <input class="promo-input" id="promoInput" placeholder="কোড লিখুন..." value="${appliedPromo||''}">
-        <button class="promo-apply-btn" onclick="applyPromo()">প্রয়োগ করুন</button>
-      </div>
-      <div class="promo-msg ${appliedPromo?'success':''}" id="promoMsg">
-        ${appliedPromo ? `✅ "${appliedPromo}" কোড প্রয়োগ হয়েছে — ${promoCodes[appliedPromo].label}` : ''}
-      </div>
+      ${appliedPromo ? `
+        <div style="display:flex;align-items:center;justify-content:space-between;
+          background:#eaf0d8;border:2px solid var(--sage);border-radius:10px;padding:10px 14px">
+          <div>
+            <div style="font-weight:700;color:var(--sage);font-size:0.92rem">
+              ✅ "${appliedPromo}" প্রয়োগ হয়েছে
+            </div>
+            <div style="font-size:0.8rem;color:#5d6e52;margin-top:2px">
+              ${promoCodes[appliedPromo]?.label || ''}
+            </div>
+          </div>
+          <button onclick="clearPromo()"
+            style="background:none;border:2px solid #c0392b;color:#c0392b;
+            border-radius:8px;padding:6px 14px;cursor:pointer;
+            font-family:'Hind Siliguri',sans-serif;font-size:0.82rem;font-weight:700;
+            transition:all 0.2s"
+            onmouseover="this.style.background='#c0392b';this.style.color='white'"
+            onmouseout="this.style.background='none';this.style.color='#c0392b'">
+            ✕ বাদ দিন
+          </button>
+        </div>
+      ` : `
+        <div class="promo-row">
+          <input class="promo-input" id="promoInput" placeholder="কোড লিখুন..."
+            style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+          <button class="promo-apply-btn" onclick="applyPromo()">প্রয়োগ করুন</button>
+        </div>
+        <div class="promo-msg" id="promoMsg"></div>
+      `}
     </div>`;
 
   const itemsHTML = cart.map(item => `
@@ -1087,18 +1190,24 @@ function selectZone(id) {
 
 
 function applyPromo() {
-  const code = document.getElementById('promoInput').value.trim().toUpperCase();
+  const code = document.getElementById('promoInput')?.value.trim().toUpperCase();
   const msgEl = document.getElementById('promoMsg');
+  if (!code) return;
+
   if (promoCodes[code]) {
     appliedPromo = code;
-    msgEl.className = 'promo-msg success';
-    msgEl.textContent = `✅ "${code}" কোড প্রয়োগ হয়েছে — ${promoCodes[code].label}`;
-    renderCart();
+    renderCart(); // re-render to show clear button
   } else {
-    appliedPromo = null;
-    msgEl.className = 'promo-msg error';
-    msgEl.textContent = '❌ এই কোডটি সঠিক নয়';
+    if (msgEl) {
+      msgEl.className = 'promo-msg error';
+      msgEl.textContent = '❌ এই কোডটি সঠিক নয়';
+    }
   }
+}
+
+function clearPromo() {
+  appliedPromo = null;
+  renderCart(); // re-render to show input again
 }
 
 // ── ORDER SUMMARY ──
@@ -1157,6 +1266,7 @@ async function placeOrder() {
   });
 
   document.getElementById('orderIdDisplay').textContent = orderId;
+  showPaymentInfo(payment, total, orderId);
   cart = []; appliedPromo = null; selectedZone = deliveryZones[0];
   updateCartCount();
   saveCart();
@@ -1205,6 +1315,67 @@ function copyOrderId() {
     }
     document.body.removeChild(ta);
   }
+}
+
+
+// ════════════════════════════════════════════════
+// ── PAYMENT INFO ON SUCCESS PAGE ──
+// ════════════════════════════════════════════════
+function showPaymentInfo(payment, total, orderId) {
+  const box = document.getElementById('paymentInfoBox');
+  if (!box) return;
+
+  if (payment === 'ক্যাশ অন ডেলিভারি') {
+    box.style.display = 'block';
+    box.innerHTML = `
+      <div class="cod-box">
+        <h3>💵 ক্যাশ অন ডেলিভারি</h3>
+        <p>পণ্য পাওয়ার সময় ডেলিভারিম্যানকে <strong style="color:var(--clay)">৳${total}</strong> টাকা পরিশোধ করুন।</p>
+        <p style="margin-top:0.5rem">অর্ডার নিশ্চিত করতে আমরা কল করব।</p>
+      </div>`;
+    return;
+  }
+
+  const info = PAYMENT_INFO[payment];
+  if (!info) { box.style.display = 'none'; return; }
+
+  box.style.display = 'block';
+  box.innerHTML = `
+    <div class="payment-box">
+      <div class="payment-box-header">
+        <h3>${info.logo} ${info.type} এ পেমেন্ট করুন</h3>
+        <p>নিচের নম্বরে পেমেন্ট করুন</p>
+      </div>
+      <div class="payment-amount">৳${total}</div>
+      <div class="payment-number-row">
+        <span class="payment-number">${info.number}</span>
+        <button class="copy-num-btn" onclick="copyPaymentNumber('${info.number}', this)">📋 কপি</button>
+      </div>
+      <img class="payment-qr" src="${info.qr}"
+        alt="${payment} QR Code"
+        onerror="this.style.display='none'">
+      <div class="payment-note">
+        ⚠️ ${info.instruction}<br>
+        <strong>Order ID: ${orderId}</strong>
+      </div>
+    </div>`;
+}
+
+function copyPaymentNumber(num, btn) {
+  const clean = num.replace(/-/g, '');
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(clean).then(() => flashBtn(btn));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = clean; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    flashBtn(btn);
+  }
+}
+function flashBtn(btn) {
+  btn.textContent = '✅ কপি!';
+  setTimeout(() => btn.textContent = '📋 কপি', 2000);
 }
 
 // ── TOAST ──
@@ -2139,6 +2310,54 @@ footer {
 }
 .copy-tracking-btn:hover { background:rgba(255,255,255,0.35); }
 .track-error { text-align:center; padding:2rem; color:#c0392b; font-weight:600; }
+
+
+/* ── PAYMENT INFO BOX ── */
+.payment-box {
+  background: white; border-radius: 16px; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(61,35,20,0.12); text-align: center;
+}
+.payment-box-header {
+  padding: 1rem 1.5rem 0.8rem;
+  border-bottom: 1px solid var(--clay-light);
+}
+.payment-box-header h3 { font-size: 1rem; font-weight: 700; color: var(--earth); margin-bottom: 0.2rem; }
+.payment-box-header p { font-size: 0.82rem; color: #7a5a45; }
+.payment-amount {
+  font-size: 1.5rem; font-weight: 700; color: var(--clay);
+  background: var(--cream); padding: 0.6rem 1rem; margin: 0.8rem 1rem 0;
+  border-radius: 10px; font-family: monospace;
+}
+.payment-number-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0.5rem; padding: 0.6rem 1rem; flex-wrap: wrap;
+}
+.payment-number {
+  font-size: 1.1rem; font-weight: 700; font-family: monospace;
+  color: var(--earth); letter-spacing: 1px;
+}
+.copy-num-btn {
+  background: var(--clay-light); border: none; border-radius: 6px;
+  padding: 4px 10px; cursor: pointer; font-size: 0.78rem; font-weight: 700;
+  color: var(--clay-dark); font-family: 'Hind Siliguri', sans-serif;
+  transition: all 0.2s;
+}
+.copy-num-btn:hover { background: var(--clay); color: white; }
+.payment-qr {
+  width: 180px; height: 180px; object-fit: contain;
+  margin: 0.5rem auto 1rem; display: block; border-radius: 10px;
+  border: 2px solid var(--clay-light);
+}
+.payment-note {
+  background: #fff8e8; border-top: 1px solid var(--gold);
+  padding: 0.7rem 1rem; font-size: 0.78rem; color: #7a5a00;
+}
+.cod-box {
+  background: white; border-radius: 16px; padding: 1.2rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(61,35,20,0.12); text-align: center;
+}
+.cod-box h3 { font-size: 1rem; font-weight: 700; color: var(--earth); margin-bottom: 0.5rem; }
+.cod-box p { font-size: 0.85rem; color: #7a5a45; line-height: 1.6; }
 
 /* ── PRODUCT POPUP MODAL ── */
 .pmod-overlay {
