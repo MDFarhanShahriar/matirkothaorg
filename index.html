@@ -882,7 +882,7 @@ footer {
 // ════════════════════════════════════════════════════════════
 //  ⚙️  GOOGLE SHEETS CONFIG — replace URL after deploying
 // ════════════════════════════════════════════════════════════
-const API_URL = 'https://script.google.com/macros/s/AKfycbw_Cz3jUyShBeKMmVKLdy2YS4TkWU6kKAxqgFSVLhevrrXp1VziWqPdCgA-5n1nmhX-/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxAmktqhG4Hyiaohf9ms37F7oGQ8KDXiKvWvwuFV7L-5O7nDUBn_e9AOip1y5dbTych7A/exec';
 // How to get this URL:
 //  1. Open your Google Sheet → Extensions → Apps Script
 //  2. Paste the code from Code.gs (the other file)
@@ -1586,7 +1586,7 @@ function buildTrackingResult(o) {
       </div>
 
       ${courierHTML}
-      ${(!isCancelled && currentIdx < 3) ? `
+      ${(o.status === 'নতুন') ? `
         <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--clay-light);text-align:center">
           <button onclick="cancelFromTracking('${o.order_id}', '${o.phone||''}')"
             style="background:white;border:2px solid #c0392b;color:#c0392b;padding:9px 20px;
@@ -1659,7 +1659,7 @@ function buildHistoryCard(o, phone) {
     'সম্পন্ন':{bg:'#d8f5e8',color:'#27ae60'}, 'বাতিল':{bg:'#fde8e8',color:'#c0392b'},
   }[o.status] || {bg:'#eee',color:'#333'};
 
-  const canCancel = o.status !== 'বাতিল' && o.status !== 'পাঠানো হয়েছে' && o.status !== 'সম্পন্ন';
+  const canCancel = o.status === 'নতুন'; // শুধু নতুন অবস্থায় cancel করা যাবে
 
   // Parse items for reorder
   let itemsJson = '';
