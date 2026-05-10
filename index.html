@@ -700,11 +700,14 @@ footer {
     <p style="margin-top:1rem">আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।</p>
     <p style="margin-top:0.4rem">📞 <strong>01621-978541</strong></p>
     <br>
-    <div style="display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap">
+    <div style="display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;margin-top:0.5rem">
       <button class="btn-primary" onclick="showPage('home')" style="font-family:'Hind Siliguri',sans-serif">আবার কেনাকাটা করুন</button>
-      <button onclick="showPage('history')" style="background:white;border:2px solid var(--clay);color:var(--clay);padding:13px 28px;border-radius:8px;font-family:'Hind Siliguri',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s"
+      <button onclick="showPage('history')" style="background:white;border:2px solid var(--clay);color:var(--clay);padding:13px 24px;border-radius:8px;font-family:'Hind Siliguri',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s"
         onmouseover="this.style.background='var(--clay)';this.style.color='white'"
         onmouseout="this.style.background='white';this.style.color='var(--clay)'">📋 অর্ডার দেখুন</button>
+      <button onclick="generateInvoice()" style="background:var(--earth);color:white;border:none;padding:13px 24px;border-radius:8px;font-family:'Hind Siliguri',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:background 0.2s"
+        onmouseover="this.style.background='#5a3820'"
+        onmouseout="this.style.background='var(--earth)'">🧾 রসিদ ডাউনলোড</button>
     </div>
   </div>
 </div>
@@ -1319,6 +1322,17 @@ async function placeOrder() {
 
   document.getElementById('orderIdDisplay').textContent = orderId;
   showPaymentInfo(payment, total, orderId);
+
+  // Save invoice snapshot before clearing cart
+  lastOrderSnapshot = {
+    orderId, name, phone, address, payment, note,
+    zone: selectedZone.label,
+    promo: appliedPromo || '',
+    subtotal, discount, delivery, codFee, total,
+    date: new Date().toLocaleString('bn-BD'),
+    items: cart.map(i => ({ ...i })), // full copy with name, price etc
+  };
+
   cart = []; appliedPromo = null; selectedZone = deliveryZones[0];
   updateCartCount();
   saveCart();
@@ -1745,6 +1759,141 @@ async function cancelFromTracking(orderId, phone) {
   } catch(e) { showToast('❌ সংযোগ সমস্যা!'); }
 }
 
+
+
+// ════════════════════════════════════════════════
+// ── INVOICE / RECEIPT GENERATOR ──
+// ════════════════════════════════════════════════
+let lastOrderSnapshot = null;
+
+function generateInvoice() {
+  const o = lastOrderSnapshot;
+  if (!o) { showToast('রসিদের তথ্য পাওয়া যায়নি!'); return; }
+
+  const itemRows = o.items.map(i => `
+    <tr>
+      <td style="padding:8px 12px;border-bottom:1px solid #f0e8de">${i.name}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #f0e8de;text-align:center">${i.qty}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #f0e8de;text-align:right">৳${i.price}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #f0e8de;text-align:right;font-weight:600">৳${i.price * i.qty}</td>
+    </tr>`).join('');
+
+  const invoiceHTML = `<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<title>রসিদ — ${o.orderId}</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Hind Siliguri',sans-serif; background:#f5f0ea; display:flex; justify-content:center; padding:2rem; }
+  .invoice { background:white; width:100%; max-width:680px; border-radius:12px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.1); }
+  .inv-header { background:linear-gradient(135deg,#3D2314,#8B4A2E); color:white; padding:2rem; display:flex; justify-content:space-between; align-items:flex-start; }
+  .inv-logo { font-size:1.6rem; font-weight:700; margin-bottom:0.2rem; }
+  .inv-logo span { font-size:2rem; }
+  .inv-tagline { font-size:0.78rem; opacity:0.75; }
+  .inv-header-right { text-align:right; }
+  .inv-title { font-size:1.4rem; font-weight:700; letter-spacing:2px; }
+  .inv-id { font-size:0.8rem; opacity:0.8; margin-top:3px; font-family:monospace; }
+  .inv-date { font-size:0.75rem; opacity:0.7; margin-top:2px; }
+  .inv-body { padding:1.8rem; }
+  .inv-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+  .inv-section label { font-size:0.7rem; font-weight:700; color:#8B4A2E; letter-spacing:1px; text-transform:uppercase; display:block; margin-bottom:6px; }
+  .inv-section p { font-size:0.9rem; color:#3D2314; line-height:1.6; }
+  .inv-section p strong { font-weight:700; }
+  table { width:100%; border-collapse:collapse; margin-bottom:1.2rem; }
+  thead { background:#3D2314; color:white; }
+  thead th { padding:10px 12px; font-size:0.82rem; font-weight:700; text-align:left; }
+  thead th:nth-child(2) { text-align:center; }
+  thead th:nth-child(3), thead th:nth-child(4) { text-align:right; }
+  .totals { background:#faf5ee; border-radius:10px; padding:1rem 1.2rem; margin-bottom:1.5rem; }
+  .tot-row { display:flex; justify-content:space-between; padding:5px 0; font-size:0.9rem; color:#5a3820; }
+  .tot-row.final { font-size:1.1rem; font-weight:700; color:#3D2314; border-top:2px solid #C2714F; margin-top:6px; padding-top:10px; }
+  .inv-footer { background:#faf5ee; border-top:2px dashed #E8C4A8; padding:1.2rem 1.8rem; display:flex; justify-content:space-between; align-items:center; }
+  .inv-footer p { font-size:0.78rem; color:#7a5a45; }
+  .inv-footer .thank { font-size:0.95rem; font-weight:700; color:#8B4A2E; }
+  .badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:700; }
+  @media print {
+    body { background:white; padding:0; }
+    .invoice { box-shadow:none; border-radius:0; }
+    .no-print { display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="invoice">
+  <div class="inv-header">
+    <div>
+      <div class="inv-logo"><img src="assets/favicon.png" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;border:2px solid rgba(255,255,255,0.3)"> মাটির কথা</div>
+      <div class="inv-tagline">নওয়াপাড়া শিল্পনগরী, অভয়নগর, যশোর</div>
+      <div class="inv-tagline" style="margin-top:3px">📞 01621-978541</div>
+    </div>
+    <div class="inv-header-right">
+      <div class="inv-title">রসিদ</div>
+      <div class="inv-id">${o.orderId}</div>
+      <div class="inv-date">${o.date}</div>
+    </div>
+  </div>
+
+  <div class="inv-body">
+    <div class="inv-grid">
+      <div class="inv-section">
+        <label>ক্রেতার তথ্য</label>
+        <p><strong>${o.name}</strong><br>
+        📞 ${o.phone}<br>
+        📍 ${o.address}<br>
+        🚚 ${o.zone}</p>
+      </div>
+      <div class="inv-section">
+        <label>পেমেন্ট তথ্য</label>
+        <p><strong>${o.payment}</strong><br>
+        ${o.promo ? `🏷️ প্রোমো: ${o.promo}<br>` : ''}
+        ${o.note ? `📝 নোট: ${o.note}` : ''}</p>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>পণ্যের নাম</th>
+          <th style="text-align:center">পরিমাণ</th>
+          <th style="text-align:right">একক মূল্য</th>
+          <th style="text-align:right">মোট</th>
+        </tr>
+      </thead>
+      <tbody>${itemRows}</tbody>
+    </table>
+
+    <div class="totals">
+      <div class="tot-row"><span>পণ্যের মূল্য</span><span>৳${o.subtotal}</span></div>
+      ${o.discount > 0 ? `<div class="tot-row" style="color:#7A8C6E"><span>🏷️ ছাড় (${o.promo})</span><span>−৳${o.discount}</span></div>` : ''}
+      <div class="tot-row"><span>ডেলিভারি চার্জ</span><span>${o.delivery === 0 ? 'বিনামূল্যে' : '৳'+o.delivery}</span></div>
+      ${o.codFee > 0 ? `<div class="tot-row"><span>COD চার্জ</span><span>৳${o.codFee}</span></div>` : ''}
+      <div class="tot-row final"><span>সর্বমোট পরিশোধযোগ্য</span><span>৳${o.total}</span></div>
+    </div>
+  </div>
+
+  <div class="inv-footer">
+    <div>
+      <p class="thank">ধন্যবাদ আমাদের সাথে কেনাকাটা করার জন্য!</p>
+      <p>কোনো সমস্যায় যোগাযোগ করুন: 01621-978541</p>
+    </div>
+    <button class="no-print" onclick="window.print()" style="background:#3D2314;color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-weight:700;font-size:0.9rem">🖨️ প্রিন্ট করুন</button>
+  </div>
+</div>
+</body>
+</html>`;
+
+  // Open in new tab
+  const blob = new Blob([invoiceHTML], { type:'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `receipt-${o.orderId}.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ রসিদ ডাউনলোড হচ্ছে...');
+}
 
 // ── INIT — load Sheets data then render ──
 (async () => {
