@@ -535,7 +535,10 @@ function buildTable(orders) {
           <td style="font-weight:700;color:var(--clay)">৳${o.total||0}</td>
           <td><span class="status-badge" style="background:${sc.bg};color:${sc.color}">${o.status||'নতুন'}</span></td>
           <td style="font-size:0.78rem;font-family:monospace">${hasTracking ? '✅ '+String(o.courier_tracking).substring(0,12) : '—'}</td>
-          <td><button class="action-btn edit-btn" onclick='openOrderModal(${JSON.stringify(JSON.stringify(o))})'>✏️ আপডেট</button></td>
+          <td style="display:flex;gap:4px">
+            <button class="action-btn edit-btn" onclick='openOrderModal(${JSON.stringify(JSON.stringify(o))})'>✏️ আপডেট</button>
+            <button class="action-btn" onclick='adminGenerateInvoice(${JSON.stringify(JSON.stringify(o))})' style="background:#3D2314;color:white">🧾 রসিদ</button>
+          </td>
         </tr>`;
       }).join('')}
     </tbody>
@@ -635,6 +638,135 @@ function closeModalOutside(e) {
   if (e.target === document.getElementById('orderModal')) closeModal();
 }
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
+
+// ════════════════════════════════════════════════
+// ── ADMIN INVOICE GENERATOR ──
+// ════════════════════════════════════════════════
+function adminGenerateInvoice(orderJson) {
+  const o = JSON.parse(orderJson);
+
+  // Parse items
+  let itemRows = '';
+  let subtotalCalc = 0;
+  try {
+    const items = typeof o.items_json === 'string' ? JSON.parse(o.items_json) : (o.items_json || []);
+    itemRows = items.map(i => {
+      // Find product name from allOrders context (id+qty only stored)
+      const lineTotal = (i.lineTotal || (i.price && i.price * i.qty) || 0);
+      subtotalCalc += lineTotal;
+      return `<tr>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0e8de">${i.name || 'পণ্য id:'+i.id}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0e8de;text-align:center">${i.qty}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0e8de;text-align:right">${i.price ? '৳'+i.price : '—'}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0e8de;text-align:right;font-weight:600">${lineTotal ? '৳'+lineTotal : '—'}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    itemRows = `<tr><td colspan="4" style="padding:8px 12px;color:#7a5a45">${String(o.items_json||'')}</td></tr>`;
+  }
+
+  const subtotal = o.subtotal || subtotalCalc || o.total;
+  const discount = o.discount || 0;
+  const delivery = o.delivery || 0;
+  const codFee   = o.cod_fee  || 0;
+  const total    = o.total    || 0;
+
+  const invoiceHTML = `<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<title>রসিদ — ${o.order_id}</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Hind Siliguri',sans-serif;background:#f5f0ea;display:flex;justify-content:center;padding:2rem}
+  .invoice{background:white;width:100%;max-width:680px;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.1)}
+  .inv-header{background:linear-gradient(135deg,#3D2314,#8B4A2E);color:white;padding:2rem;display:flex;justify-content:space-between;align-items:flex-start}
+  .inv-logo{font-size:1.6rem;font-weight:700;margin-bottom:0.2rem}
+  .inv-title{font-size:1.4rem;font-weight:700;letter-spacing:2px;text-align:right}
+  .inv-id{font-size:0.8rem;opacity:0.8;margin-top:3px;font-family:monospace;text-align:right}
+  .inv-body{padding:1.8rem}
+  .inv-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+  .inv-section label{font-size:0.7rem;font-weight:700;color:#8B4A2E;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px}
+  .inv-section p{font-size:0.9rem;color:#3D2314;line-height:1.6}
+  table{width:100%;border-collapse:collapse;margin-bottom:1.2rem}
+  thead{background:#3D2314;color:white}
+  thead th{padding:10px 12px;font-size:0.82rem;font-weight:700;text-align:left}
+  thead th:nth-child(n+2){text-align:right}
+  thead th:nth-child(2){text-align:center}
+  .totals{background:#faf5ee;border-radius:10px;padding:1rem 1.2rem;margin-bottom:1.5rem}
+  .tot-row{display:flex;justify-content:space-between;padding:5px 0;font-size:0.9rem;color:#5a3820}
+  .tot-row.final{font-size:1.1rem;font-weight:700;color:#3D2314;border-top:2px solid #C2714F;margin-top:6px;padding-top:10px}
+  .inv-footer{background:#faf5ee;border-top:2px dashed #E8C4A8;padding:1.2rem 1.8rem;display:flex;justify-content:space-between;align-items:center}
+  .inv-footer p{font-size:0.78rem;color:#7a5a45}
+  .thank{font-size:0.95rem;font-weight:700;color:#8B4A2E}
+  @media print{body{background:white;padding:0}.invoice{box-shadow:none;border-radius:0}.no-print{display:none}}
+</style>
+</head>
+<body>
+<div class="invoice">
+  <div class="inv-header">
+    <div>
+      <div class="inv-logo"><img src="assets/favicon.png" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;border:2px solid rgba(255,255,255,0.3)"> মাটির কথা</div>
+      <div style="font-size:0.78rem;opacity:0.75">নওয়াপাড়া শিল্পনগরী, অভয়নগর, যশোর</div>
+      <div style="font-size:0.75rem;opacity:0.7;margin-top:2px">📞 01621-978541</div>
+    </div>
+    <div>
+      <div class="inv-title">রসিদ / Invoice</div>
+      <div class="inv-id">${o.order_id}</div>
+      <div style="font-size:0.75rem;opacity:0.7;text-align:right;margin-top:2px">${String(o.date||'').substring(0,16)}</div>
+    </div>
+  </div>
+  <div class="inv-body">
+    <div class="inv-grid">
+      <div class="inv-section">
+        <label>ক্রেতার তথ্য</label>
+        <p><strong>${o.name||''}</strong><br>
+        📞 ${o.phone||''}<br>
+        📍 ${o.address||''}<br>
+        🚚 ${o.zone||''}</p>
+      </div>
+      <div class="inv-section">
+        <label>পেমেন্ট ও স্ট্যাটাস</label>
+        <p><strong>${o.payment||''}</strong><br>
+        স্ট্যাটাস: <strong>${o.status||'নতুন'}</strong><br>
+        ${o.promo ? '🏷️ প্রোমো: '+o.promo+'<br>' : ''}
+        ${o.courier_tracking ? '🚚 ট্র্যাকিং: '+o.courier_tracking : ''}</p>
+      </div>
+    </div>
+    <table>
+      <thead><tr>
+        <th>পণ্যের নাম</th><th style="text-align:center">পরিমাণ</th>
+        <th style="text-align:right">একক মূল্য</th><th style="text-align:right">মোট</th>
+      </tr></thead>
+      <tbody>${itemRows}</tbody>
+    </table>
+    <div class="totals">
+      <div class="tot-row"><span>পণ্যের মূল্য</span><span>৳${subtotal}</span></div>
+      ${discount > 0 ? `<div class="tot-row" style="color:#7A8C6E"><span>🏷️ ছাড়</span><span>−৳${discount}</span></div>` : ''}
+      <div class="tot-row"><span>ডেলিভারি চার্জ</span><span>${delivery===0?'বিনামূল্যে':'৳'+delivery}</span></div>
+      ${codFee > 0 ? `<div class="tot-row"><span>COD চার্জ</span><span>৳${codFee}</span></div>` : ''}
+      <div class="tot-row final"><span>সর্বমোট পরিশোধযোগ্য</span><span>৳${total}</span></div>
+    </div>
+  </div>
+  <div class="inv-footer">
+    <div>
+      <p class="thank">ধন্যবাদ আমাদের সাথে কেনাকাটা করার জন্য!</p>
+      <p>যোগাযোগ: 01621-978541</p>
+    </div>
+    <button class="no-print" onclick="window.print()" style="background:#3D2314;color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-weight:700">🖨️ প্রিন্ট</button>
+  </div>
+</div>
+</body></html>`;
+
+  const blob = new Blob([invoiceHTML], { type:'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `receipt-${o.order_id}.html`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ রসিদ ডাউনলোড হচ্ছে...');
+}
 
 // ── TOAST ──
 function showToast(msg) {
