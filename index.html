@@ -885,7 +885,7 @@ footer {
 // ════════════════════════════════════════════════════════════
 //  ⚙️  GOOGLE SHEETS CONFIG — replace URL after deploying
 // ════════════════════════════════════════════════════════════
-const API_URL = 'https://script.google.com/macros/s/AKfycbxAmktqhG4Hyiaohf9ms37F7oGQ8KDXiKvWvwuFV7L-5O7nDUBn_e9AOip1y5dbTych7A/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwQrvwnV949tQ_aOv3lVjN4H1DOMz-nOTlLqLdTlitcFT7AsCv6NVeBORtdYj-3Ux5dNw/exec';
 // How to get this URL:
 //  1. Open your Google Sheet → Extensions → Apps Script
 //  2. Paste the code from Code.gs (the other file)
@@ -1979,6 +1979,17 @@ async function syncProducts() {
 
     // Update cart stock warnings if cart is open
     if (document.getElementById('page-cart')?.classList.contains('active')) renderCart();
+
+    // Auto-refresh tracking & history if active
+    if (document.getElementById('page-tracking')?.classList.contains('active')) {
+      const orderId = document.getElementById('trackOrderId')?.value.trim();
+      const phone   = document.getElementById('trackPhone')?.value.trim();
+      if (orderId && phone) trackOrder();
+    }
+    if (document.getElementById('page-history')?.classList.contains('active')) {
+      const phone = document.getElementById('historyPhone')?.value.trim();
+      if (phone) loadHistory();
+    }
 
     showSyncBadge();
   } catch(e) {
