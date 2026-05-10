@@ -1889,71 +1889,38 @@ function generateInvoice() {
 
 
 // ════════════════════════════════════════════════
-// ── PDF GENERATOR ──
+// ── PDF GENERATOR (Print-based — crisp quality) ──
 // ════════════════════════════════════════════════
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
-    const s = document.createElement('script');
-    s.src = src; s.onload = resolve; s.onerror = reject;
-    document.head.appendChild(s);
-  });
-}
-
-async function downloadAsPDF(htmlContent, filename) {
-  const btn = event?.target;
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ PDF তৈরি হচ্ছে...'; }
-  showToast('⏳ PDF তৈরি হচ্ছে...');
-
-  try {
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
-
-    // Render invoice in hidden iframe
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;height:1123px;border:none;visibility:hidden';
-    document.body.appendChild(iframe);
-
-    iframe.contentDocument.open();
-    iframe.contentDocument.write(htmlContent);
-    iframe.contentDocument.close();
-
-    // Wait for fonts & images
-    await new Promise(r => setTimeout(r, 1500));
-
-    const canvas = await html2canvas(iframe.contentDocument.body, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      width: 794,
-      logging: false,
-    });
-
-    document.body.removeChild(iframe);
-
-    const { jsPDF } = window.jspdf;
-    const pdf    = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const pageW  = pdf.internal.pageSize.getWidth();
-    const pageH  = pdf.internal.pageSize.getHeight();
-    const ratio  = canvas.width / canvas.height;
-    const imgH   = pageW / ratio;
-
-    // Split into pages if content is tall
-    let yPos = 0;
-    while (yPos < imgH) {
-      if (yPos > 0) pdf.addPage();
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, -yPos, pageW, imgH);
-      yPos += pageH;
-    }
-
-    pdf.save(filename);
-    showToast('✅ PDF ডাউনলোড হয়েছে!');
-  } catch(e) {
-    console.error('PDF error:', e);
-    showToast('❌ PDF তৈরিতে সমস্যা হয়েছে!');
+function downloadAsPDF(htmlContent, filename) {
+  // Add print CSS to auto-trigger save dialog and close after
+  const printReady = htmlContent.replace(
+    '</style>',
+    `
+  @page { size: A4; margin: 0; }
+  @media print {
+    body { margin: 0; padding: 0; background: white !important; }
+    .invoice { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; }
+    .no-print { display: none !important; }
   }
+  </style>`
+  ).replace(
+    '</body>',
+    `<script>
+      window.onload = function() {
+        // Set suggested filename via title
+        document.title = '${filename.replace('.pdf','')}';
+        setTimeout(function() { window.print(); }, 600);
+      };
+    <\/script>
+  </body>`
+  );
 
-  if (btn) { btn.disabled = false; btn.textContent = '🧾 রসিদ ডাউনলোড'; }
+  const win = window.open('', '_blank', 'width=900,height=700');
+  if (!win) { showToast('❌ Popup blocked! Browser settings থেকে popup allow করুন।'); return; }
+  win.document.open();
+  win.document.write(printReady);
+  win.document.close();
+  showToast('✅ প্রিন্ট ডায়ালগ খুলছে — "Save as PDF" বেছে নিন');
 }
 
 // ── INIT — load Sheets data then render ──
