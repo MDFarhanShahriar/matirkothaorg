@@ -278,7 +278,7 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
 // ════════════════════════════════════════════════
 // CONFIG — আপনার Apps Script URL এখানে দিন
 // ════════════════════════════════════════════════
-const API_URL = 'https://script.google.com/macros/s/AKfycbxAmktqhG4Hyiaohf9ms37F7oGQ8KDXiKvWvwuFV7L-5O7nDUBn_e9AOip1y5dbTych7A/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwQrvwnV949tQ_aOv3lVjN4H1DOMz-nOTlLqLdTlitcFT7AsCv6NVeBORtdYj-3Ux5dNw/exec';
 const ADMIN_PASS_KEY = 'matirKothaAdminPass';
 
 // ── STATE ──
@@ -329,8 +329,17 @@ async function silentRefresh() {
       newOrders.filter(o => o.status === 'নতুন').length;
 
     // Silently re-render active section
-    if (document.getElementById('sec-orders')?.classList.contains('active')) renderOrdersTable();
-    if (document.getElementById('sec-dashboard')?.classList.contains('active')) renderRecentOrders();
+    const dashActive   = document.getElementById('sec-dashboard')?.classList.contains('active');
+    const ordersActive = document.getElementById('sec-orders')?.classList.contains('active');
+    if (ordersActive) renderOrdersTable();
+    if (dashActive)   renderRecentOrders();
+
+    // Always refresh stats (fixes আজকের অর্ডার/আয়)
+    try {
+      const sRes  = await fetch(`${API_URL}?action=adminGetStats&pass=${encodeURIComponent(adminPass)}`);
+      const sData = await sRes.json();
+      if (sData.success) renderStats(sData.stats);
+    } catch(e) {}
 
     updateLastSyncTime();
   } catch(e) {}
