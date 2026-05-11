@@ -1,180 +1,515 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>মাটির কথা — লেবেল ও স্লিপ জেনারেটর</title>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        :root { --earth: #3D2314; --clay: #C2714F; --white: #ffffff; }
-        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f4f1ee; padding: 20px; display: flex; flex-direction: row; gap: 30px; justify-content: center; }
-        
-        /* Input Panel */
-        .input-panel { background: var(--white); padding: 20px; border-radius: 8px; width: 400px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 20px; height: fit-content; }
-        .input-panel h2 { color: var(--earth); margin-top: 0; font-size: 1.2rem; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .form-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 4px; font-size: 0.9rem; font-weight: 600; }
-        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 0.9rem; }
-        .print-btn { background: var(--clay); color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>মাটির কথা — লেবেল জেনারেটর</title>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --earth:#3D2314; --clay:#C2714F; --clay-light:#E8C4A8; --cream:#FBF5EE; --sage:#7A8C6E; --gold:#D4A853; }
+* { box-sizing: border-box; margin:0; padding:0; }
+body { font-family:'Hind Siliguri',sans-serif; background:#f4f1ee; padding:20px; display:flex; gap:24px; justify-content:center; min-height:100vh; }
 
-        /* Preview Panel */
-        .preview-panel { display: flex; flex-direction: column; gap: 20px; }
-        
-        /* Shipping Label Style */
-        .label-card { width: 450px; background: white; border: 2px solid var(--earth); padding: 20px; color: black; }
-        .header { border-bottom: 2px solid var(--earth); display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; margin-bottom: 10px; }
-        
-        /* Logo and Brand Styling */
-        .brand-container { display: flex; align-items: center; gap: 10px; }
-        .brand-logo { width: 45px; height: 45px; object-fit: contain; }
-        .header h1 { margin: 0; font-size: 1.5rem; color: var(--earth); }
-        
-        .fragile-tag { border: 1px solid black; padding: 2px 6px; font-size: 0.7rem; font-weight: bold; }
-        .address-box { margin-bottom: 10px; }
-        .address-box h4 { margin: 0; font-size: 0.7rem; color: #666; text-transform: uppercase; border-bottom: 1px solid #eee; }
-        .address-box p { margin: 3px 0; font-size: 1rem; line-height: 1.3; }
-        
-        /* Return Slip Style */
-        .return-slip { width: 450px; border: 2px dashed #666; padding: 20px; background: white; }
-        .cod-badge { border: 2px solid black; padding: 5px; text-align: center; min-width: 120px; background: #f9f9f9; }
-        .cod-amount { font-size: 1.2rem; font-weight: bold; display: block; }
-        
-        #barcode { width: 100%; height: 50px; margin-top: 10px; }
+/* ── INPUT PANEL ── */
+.input-panel {
+  background:white; padding:20px; border-radius:12px; width:380px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.1); position:sticky; top:20px;
+  height:fit-content; max-height:calc(100vh - 40px); overflow-y:auto;
+}
+.input-panel h2 { color:var(--earth); font-size:1.1rem; border-bottom:2px solid var(--clay-light); padding-bottom:10px; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.section-title { font-size:0.78rem; font-weight:700; color:var(--clay); text-transform:uppercase; letter-spacing:1px; margin:14px 0 8px; border-left:3px solid var(--clay); padding-left:8px; }
+.form-group { margin-bottom:10px; }
+.form-group label { display:block; margin-bottom:4px; font-size:0.85rem; font-weight:600; color:#5a3820; }
+.form-group input, .form-group select, .form-group textarea {
+  width:100%; padding:8px 10px; border:1.5px solid #ddd; border-radius:6px;
+  font-family:inherit; font-size:0.88rem; outline:none; transition:border-color 0.2s;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--clay); }
+.form-row { display:flex; gap:8px; }
+.form-row > div { flex:1; }
 
-        /* Print Media Query */
-        @media print {
-            .input-panel { display: none; }
-            body { background: white; padding: 0; display: block; }
-            .preview-panel { gap: 0; }
-            .label-card, .return-slip { box-shadow: none; border-color: black; margin: 0 auto 20px auto; page-break-inside: avoid; }
-        }
-    </style>
+/* Order selector */
+.order-selector { background:var(--cream); border-radius:8px; padding:12px; margin-bottom:12px; }
+.order-selector h4 { font-size:0.82rem; font-weight:700; color:var(--clay-dark); margin-bottom:8px; }
+.order-search-row { display:flex; gap:6px; }
+.order-search-row input { flex:1; padding:7px 10px; border:1.5px solid #ddd; border-radius:6px; font-family:inherit; font-size:0.85rem; outline:none; }
+.order-search-row input:focus { border-color:var(--clay); }
+.fetch-btn { background:var(--clay); color:white; border:none; padding:7px 14px; border-radius:6px; cursor:pointer; font-family:inherit; font-size:0.82rem; font-weight:700; white-space:nowrap; }
+.fetch-btn:hover { background:var(--earth); }
+.order-list { max-height:160px; overflow-y:auto; margin-top:8px; border:1px solid #ddd; border-radius:6px; background:white; }
+.order-item {
+  padding:8px 10px; font-size:0.82rem; cursor:pointer; border-bottom:1px solid #f0e8de;
+  transition:background 0.15s; display:flex; justify-content:space-between; align-items:center;
+}
+.order-item:last-child { border:none; }
+.order-item:hover { background:var(--cream); }
+.order-item.selected { background:var(--clay-light); }
+.order-item .status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+/* Action buttons */
+.btn-group { display:flex; gap:8px; margin-top:14px; }
+.print-btn { background:var(--clay); color:white; border:none; padding:11px; border-radius:6px; cursor:pointer; font-family:inherit; font-weight:700; flex:1; font-size:0.9rem; }
+.print-btn:hover { background:var(--earth); }
+.print-all-btn { background:var(--earth); color:white; border:none; padding:11px; border-radius:6px; cursor:pointer; font-family:inherit; font-weight:700; flex:1; font-size:0.9rem; }
+.print-all-btn:hover { background:#2a1a0e; }
+
+/* Multi-select */
+.multi-check { display:flex; align-items:center; gap:6px; font-size:0.82rem; padding:5px 8px; cursor:pointer; border-radius:4px; transition:background 0.15s; }
+.multi-check:hover { background:var(--cream); }
+.multi-check input[type=checkbox] { width:auto; }
+.selected-count { background:var(--clay); color:white; border-radius:10px; padding:2px 8px; font-size:0.72rem; font-weight:700; margin-left:4px; }
+
+/* toast */
+.toast { position:fixed; bottom:1rem; right:1rem; background:var(--earth); color:white; padding:10px 16px; border-radius:8px; font-size:0.85rem; transform:translateY(60px); opacity:0; transition:all 0.3s; z-index:999; }
+.toast.show { transform:translateY(0); opacity:1; }
+
+/* ── PREVIEW PANEL ── */
+.preview-panel { display:flex; flex-direction:column; gap:24px; }
+
+/* ── LABEL CARD ── */
+.label-wrap { display:flex; flex-direction:column; gap:16px; }
+.label-card {
+  width:460px; background:white; border:2px solid var(--earth);
+  padding:18px; color:black; page-break-inside:avoid;
+}
+.label-header { border-bottom:2px solid var(--earth); display:flex; justify-content:space-between; align-items:center; padding-bottom:8px; margin-bottom:12px; }
+.brand-container { display:flex; align-items:center; gap:8px; }
+.brand-logo { width:40px; height:40px; object-fit:contain; border-radius:50%; }
+.brand-name { font-size:1.3rem; font-weight:700; color:var(--earth); }
+.fragile-tag { border:1.5px solid black; padding:3px 8px; font-size:0.68rem; font-weight:700; text-align:center; }
+.address-box { margin-bottom:10px; }
+.address-box h4 { margin:0 0 4px; font-size:0.68rem; color:#666; text-transform:uppercase; border-bottom:1px solid #eee; padding-bottom:2px; }
+.address-box p { margin:2px 0; font-size:0.92rem; line-height:1.4; }
+.label-footer { display:flex; justify-content:space-between; align-items:flex-end; margin-top:10px; gap:8px; }
+.cod-badge { border:2px solid black; padding:6px 10px; text-align:center; min-width:110px; background:#f9f9f9; }
+.cod-label { font-size:0.62rem; font-weight:700; display:block; }
+.cod-amount { font-size:1.1rem; font-weight:700; }
+.products-mini { font-size:0.72rem; color:#444; border-top:1px dashed #ccc; margin-top:8px; padding-top:6px; line-height:1.6; }
+.courier-info { font-size:0.72rem; background:#f5f5f5; border:1px solid #ddd; padding:4px 8px; border-radius:4px; margin-top:6px; }
+
+/* ── RETURN SLIP ── */
+.return-slip { width:460px; border:2px dashed #666; padding:18px; background:white; page-break-inside:avoid; }
+.return-slip-head { text-align:center; border-bottom:2px solid black; padding-bottom:6px; margin-bottom:10px; font-weight:700; font-size:0.95rem; }
+.return-row { display:flex; justify-content:space-between; margin-bottom:10px; align-items:flex-start; }
+.return-amount { border:1.5px solid black; padding:5px 10px; text-align:center; }
+.return-reason { border:1px solid #ccc; padding:8px; font-size:0.78rem; color:#666; min-height:36px; margin-bottom:10px; }
+.return-footer { display:flex; justify-content:space-between; font-size:0.7rem; }
+
+/* ── PAGE DIVIDER (for multi-label) ── */
+.page-break-after { page-break-after:always; }
+
+/* ── PRINT ── */
+@media print {
+  .input-panel, .toast { display:none !important; }
+  body { background:white; padding:0; display:block; }
+  .preview-panel { gap:0; }
+  .label-wrap { gap:0; page-break-after:always; }
+  .label-wrap:last-child { page-break-after:auto; }
+  .label-card, .return-slip { width:100%; max-width:460px; margin:0 auto 16px auto; box-shadow:none; }
+}
+</style>
 </head>
 <body>
 
-    <div class="input-panel">
-        <h2>📦 লেবেল তথ্য</h2>
-        <div class="form-group">
-            <label>ক্রেতার নাম ও ফোন</label>
-            <input type="text" id="custName" placeholder="নাম" oninput="update()">
-            <input type="text" id="custPhone" placeholder="ফোন নম্বর" oninput="update()" style="margin-top:5px">
-        </div>
-        <div class="form-group">
-            <label>পুরো ঠিকানা</label>
-            <textarea id="custAddr" rows="2" placeholder="নওয়াপাড়া, যশোর" oninput="update()"></textarea>
-        </div>
-        <div class="form-group" style="display:flex; gap:10px">
-            <div style="flex:1">
-                <label>অর্ডার আইডি</label>
-                <input type="text" id="orderID" value="MK-8877" oninput="update()">
-            </div>
-            <div style="flex:1">
-                <label>পেমেন্ট মোড</label>
-                <select id="payMode" onchange="update()">
-                    <option value="COD">Cash on Delivery</option>
-                    <option value="PAID">Pre-paid</option>
-                </select>
-            </div>
-        </div>
-        <div class="form-group" id="amountGroup">
-            <label>টাকার পরিমাণ (COD হলে)</label>
-            <input type="number" id="totalAmount" value="500" oninput="update()">
-        </div>
-        <button class="print-btn" onclick="window.print()">🖨️ প্রিন্ট লেবেল ও স্লিপ</button>
+<!-- ── INPUT PANEL ── -->
+<div class="input-panel">
+  <h2>📦 লেবেল জেনারেটর</h2>
+
+  <!-- Admin connect -->
+  <div class="order-selector">
+    <h4>🔗 Admin থেকে অর্ডার লোড করুন</h4>
+    <div class="order-search-row">
+      <input type="password" id="adminPass" placeholder="Admin পাসওয়ার্ড">
+      <button class="fetch-btn" onclick="fetchOrders()">লোড</button>
     </div>
+    <div class="order-list" id="orderList" style="display:none"></div>
+  </div>
 
-    <div class="preview-panel">
-        <div class="label-card">
-            <div class="header">
-                <div class="brand-container">
-                    <img src="assets/favicon.png" alt="মাটির কথা লোগো" class="brand-logo">
-                    <h1>মাটির কথা</h1>
-                </div>
-                <div class="fragile-tag">⚠️ FRAGILE / ভঙ্গুর</div>
-            </div>
-            <div class="address-box">
-                <h4>From (প্রেরক):</h4>
-                <p><strong>মাটির কথা</strong>, নওয়াপাড়া, যশোর।<br>📞 01621-978541</p>
-            </div>
-            <div class="address-box">
-                <h4>To (প্রাপক):</h4>
-                <p><strong id="vName">ক্রেতার নাম</strong><br><span id="vAddr">ঠিকানা এখানে দেখাবে</span><br>📞 <span id="vPhone">01XXXXXXXXX</span></p>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                <div id="vCodBox" class="cod-badge">
-                    <span style="font-size:0.7rem; font-weight:bold;">CASH TO COLLECT</span>
-                    <span class="cod-amount">৳ <span id="vAmount">0</span></span>
-                </div>
-                <div style="text-align:right">
-                    <svg id="barcode"></svg>
-                </div>
-            </div>
-        </div>
-
-        <div class="return-slip">
-            <div style="text-align: center; border-bottom: 2px solid black; padding-bottom: 5px; margin-bottom: 10px;">
-                <strong>রিটার্ন স্লিপ (Return Slip)</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <div>
-                    <p style="margin:2px 0;"><strong>অর্ডার নং:</strong> <span id="vID2">#000</span></p>
-                    <p style="margin:2px 0;"><strong>তারিখ:</strong> ____/____/২০___</p>
-                </div>
-                <div id="vCodBox2" style="border: 1px solid black; padding: 5px; text-align: center;">
-                    <span style="font-size: 0.6rem; display: block;">AMOUNT</span>
-                    <span style="font-weight: bold;">৳ <span id="vAmount2">0</span></span>
-                </div>
-            </div>
-            <div style="border: 1px solid #ccc; padding: 8px; font-size: 0.8rem; color: #666; min-height: 40px;">
-                রিটার্নের কারণ: ____________________________________
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; margin-top: 15px;">
-                <span>প্যাকিং চেক: _________</span>
-                <span>স্বাক্ষর: _________</span>
-            </div>
-        </div>
+  <div class="section-title">ক্রেতার তথ্য</div>
+  <div class="form-group">
+    <label>নাম</label>
+    <input type="text" id="custName" placeholder="ক্রেতার নাম" oninput="update()">
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>ফোন</label>
+      <input type="text" id="custPhone" placeholder="01XXXXXXXXX" oninput="update()">
     </div>
+    <div class="form-group">
+      <label>অর্ডার আইডি</label>
+      <input type="text" id="orderID" value="MC-0001" oninput="update()">
+    </div>
+  </div>
+  <div class="form-group">
+    <label>ঠিকানা</label>
+    <textarea id="custAddr" rows="2" placeholder="সম্পূর্ণ ঠিকানা" oninput="update()"></textarea>
+  </div>
 
-    <script>
-        function update() {
-            const name = document.getElementById('custName').value || "ক্রেতার নাম";
-            const phone = document.getElementById('custPhone').value || "01XXXXXXXXX";
-            const addr = document.getElementById('custAddr').value || "ঠিকানা এখানে দেখাবে";
-            const id = document.getElementById('orderID').value || "0000";
-            const mode = document.getElementById('payMode').value;
-            const amount = document.getElementById('totalAmount').value || "0";
+  <div class="section-title">পেমেন্ট</div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>পেমেন্ট মোড</label>
+      <select id="payMode" onchange="update()">
+        <option value="COD">Cash on Delivery</option>
+        <option value="PAID">Pre-paid</option>
+      </select>
+    </div>
+    <div class="form-group" id="amountGroup">
+      <label>পরিমাণ (৳)</label>
+      <input type="number" id="totalAmount" value="0" oninput="update()">
+    </div>
+  </div>
 
-            // Update Text
-            document.getElementById('vName').innerText = name;
-            document.getElementById('vPhone').innerText = phone;
-            document.getElementById('vAddr').innerText = addr;
-            document.getElementById('vID2').innerText = '#' + id;
-            document.getElementById('vAmount').innerText = amount;
-            document.getElementById('vAmount2').innerText = amount;
+  <div class="section-title">কুরিয়ার তথ্য</div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>কুরিয়ার সার্ভিস</label>
+      <select id="courierName" onchange="update()">
+        <option value="">— বেছে নিন —</option>
+        <option>Pathao</option>
+        <option>Redx</option>
+        <option>Sundarban</option>
+        <option>SA Paribahan</option>
+        <option>Steadfast</option>
+        <option>eCourier</option>
+        <option>অন্যান্য</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>ট্র্যাকিং নম্বর</label>
+      <input type="text" id="courierTracking" placeholder="XXXX-000000" oninput="update()">
+    </div>
+  </div>
 
-            // COD Logic
-            if(mode === "COD") {
-                document.getElementById('vCodBox').style.visibility = "visible";
-                document.getElementById('vCodBox2').style.display = "block";
-                document.getElementById('amountGroup').style.display = "block";
-            } else {
-                document.getElementById('vCodBox').style.visibility = "hidden";
-                document.getElementById('vCodBox2').style.display = "none";
-                document.getElementById('amountGroup').style.display = "none";
-            }
+  <div class="section-title">পণ্য তালিকা</div>
+  <div class="form-group">
+    <textarea id="productsList" rows="3" placeholder="যেমন: নকশা প্লেট ×2, মাটির গ্লাস ×1" oninput="update()"></textarea>
+  </div>
 
-            // Generate Barcode
-            JsBarcode("#barcode", id, {
-                format: "CODE128",
-                width: 1.5,
-                height: 40,
-                displayValue: true,
-                fontSize: 12
-            });
-        }
-        // Initial Call
-        update();
-    </script>
+  <!-- Multi-label selection -->
+  <div id="multiSection" style="display:none">
+    <div class="section-title">একসাথে প্রিন্ট <span class="selected-count" id="selCount">0</span></div>
+    <div id="multiOrderList" style="max-height:140px;overflow-y:auto;border:1px solid #ddd;border-radius:6px;background:white"></div>
+  </div>
+
+  <div class="btn-group">
+    <button class="print-btn" onclick="printSingle()">🖨️ এই লেবেল প্রিন্ট</button>
+    <button class="print-all-btn" id="printAllBtn" onclick="printMultiple()" style="display:none">🖨️ সব প্রিন্ট</button>
+  </div>
+</div>
+
+<!-- ── PREVIEW PANEL ── -->
+<div class="preview-panel" id="previewPanel">
+  <!-- Labels rendered here -->
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════
+const API_URL = 'https://script.google.com/macros/s/AKfycbwQrvwnV949tQ_aOv3lVjN4H1DOMz-nOTlLqLdTlitcFT7AsCv6NVeBORtdYj-3Ux5dNw/exec'; // আপনার Apps Script URL
+
+const STATUS_COLORS = {
+  'নতুন':'#2980b9','নিশ্চিত':'#27ae60','প্রস্তুত':'#e67e22',
+  'পাঠানো হয়েছে':'#c2714f','সম্পন্ন':'#7A8C6E','বাতিল':'#c0392b',
+};
+
+let allOrders   = [];
+let allProducts = [];
+let selectedOrders = []; // for multi-label
+let currentOrder = null;
+
+// ════════════════════════════════════════════════
+// ADMIN FETCH
+// ════════════════════════════════════════════════
+async function fetchOrders() {
+  const pass = document.getElementById('adminPass').value.trim();
+  if (!pass) { showToast('পাসওয়ার্ড দিন!'); return; }
+
+  showToast('⏳ অর্ডার লোড হচ্ছে...');
+  try {
+    const [ordRes, prodRes] = await Promise.all([
+      fetch(`${API_URL}?action=adminGetOrders&pass=${encodeURIComponent(pass)}`).then(r=>r.json()),
+      fetch(`${API_URL}?action=getProducts`).then(r=>r.json()),
+    ]);
+
+    if (!ordRes.success) { showToast('❌ ' + ordRes.error); return; }
+
+    allOrders   = ordRes.orders || [];
+    allProducts = prodRes.success ? prodRes.products : [];
+
+    renderOrderList();
+    renderMultiList();
+    document.getElementById('orderList').style.display = 'block';
+    document.getElementById('multiSection').style.display = 'block';
+    document.getElementById('printAllBtn').style.display = 'block';
+    showToast(`✅ ${allOrders.length}টি অর্ডার লোড হয়েছে`);
+  } catch(e) {
+    showToast('❌ সংযোগ সমস্যা হয়েছে');
+  }
+}
+
+function renderOrderList() {
+  const el = document.getElementById('orderList');
+  if (!allOrders.length) { el.innerHTML = '<div style="padding:10px;font-size:0.82rem;color:#999">কোনো অর্ডার নেই</div>'; return; }
+
+  // Show only non-cancelled, non-completed
+  const active = allOrders.filter(o => o.status !== 'বাতিল');
+  el.innerHTML = active.map(o => `
+    <div class="order-item" onclick="selectOrder('${o.order_id}')">
+      <div>
+        <strong style="font-size:0.82rem;font-family:monospace">${o.order_id}</strong>
+        <span style="font-size:0.75rem;color:#666;margin-left:6px">${o.name||''}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:0.75rem;color:${STATUS_COLORS[o.status]||'#333'};font-weight:600">${o.status||'নতুন'}</span>
+        <span style="font-size:0.75rem;color:var(--clay);font-weight:700">৳${o.total||0}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderMultiList() {
+  const el = document.getElementById('multiOrderList');
+  const active = allOrders.filter(o => o.status !== 'বাতিল');
+  el.innerHTML = active.map(o => `
+    <label class="multi-check">
+      <input type="checkbox" value="${o.order_id}" onchange="toggleMulti('${o.order_id}')">
+      <span style="font-family:monospace;font-size:0.78rem">${o.order_id}</span>
+      <span style="font-size:0.75rem;color:#666;flex:1;text-align:right">${o.name||''}</span>
+    </label>`).join('');
+}
+
+function toggleMulti(orderId) {
+  if (selectedOrders.includes(orderId)) {
+    selectedOrders = selectedOrders.filter(id => id !== orderId);
+  } else {
+    selectedOrders.push(orderId);
+  }
+  document.getElementById('selCount').textContent = selectedOrders.length;
+}
+
+function selectOrder(orderId) {
+  // Highlight selected
+  document.querySelectorAll('.order-item').forEach(el => el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+
+  const o = allOrders.find(x => x.order_id === orderId);
+  if (!o) return;
+  currentOrder = o;
+
+  // Fill form
+  document.getElementById('custName').value    = o.name    || '';
+  document.getElementById('custPhone').value   = o.phone   || '';
+  document.getElementById('custAddr').value    = o.address || '';
+  document.getElementById('orderID').value     = o.order_id;
+  document.getElementById('totalAmount').value = o.total   || 0;
+  document.getElementById('courierName').value    = o.courier_name     || '';
+  document.getElementById('courierTracking').value = o.courier_tracking || '';
+
+  // Payment mode
+  document.getElementById('payMode').value =
+    (o.payment === 'ক্যাশ অন ডেলিভারি') ? 'COD' : 'PAID';
+
+  // Products list from items_json
+  try {
+    const items = typeof o.items_json === 'string' ? JSON.parse(o.items_json) : (o.items_json||[]);
+    const lines = items.map(i => {
+      const prod = allProducts.find(p => String(p.id) === String(i.id));
+      return (prod?.name || `পণ্য #${i.id}`) + ' ×' + i.qty;
+    });
+    document.getElementById('productsList').value = lines.join('\n');
+  } catch(e) {}
+
+  update();
+  showToast(`✅ ${o.order_id} লোড হয়েছে`);
+}
+
+// ════════════════════════════════════════════════
+// LABEL BUILDER
+// ════════════════════════════════════════════════
+function buildLabelHTML(data, idx) {
+  const barcodeId = `barcode-${idx}`;
+  const isCOD = data.payMode === 'COD';
+
+  const courierLine = (data.courierName || data.courierTracking)
+    ? `<div class="courier-info">🚚 <strong>${data.courierName || ''}</strong>${data.courierTracking ? ' · ' + data.courierTracking : ''}</div>`
+    : '';
+
+  const productsLine = data.products
+    ? `<div class="products-mini">📦 ${data.products.replace(/\n/g,'&nbsp;&nbsp;|&nbsp;&nbsp;')}</div>`
+    : '';
+
+  const codBox = isCOD
+    ? `<div class="cod-badge">
+        <span class="cod-label">CASH TO COLLECT</span>
+        <span class="cod-amount">৳${data.amount}</span>
+      </div>`
+    : `<div class="cod-badge" style="background:#e8f5e9;border-color:#27ae60">
+        <span class="cod-label">PAYMENT</span>
+        <span class="cod-amount" style="color:#27ae60;font-size:0.9rem">PRE-PAID ✓</span>
+      </div>`;
+
+  return `
+  <div class="label-card">
+    <div class="label-header">
+      <div class="brand-container">
+        <img src="assets/favicon.png" class="brand-logo" alt="" onerror="this.style.display='none'">
+        <span class="brand-name">মাটির কথা</span>
+      </div>
+      <div class="fragile-tag">⚠️ FRAGILE<br>ভঙ্গুর</div>
+    </div>
+    <div class="address-box">
+      <h4>From (প্রেরক):</h4>
+      <p><strong>মাটির কথা</strong> · নওয়াপাড়া শিল্পনগরী, যশোর &nbsp; 📞 01621-978541</p>
+    </div>
+    <div class="address-box">
+      <h4>To (প্রাপক):</h4>
+      <p><strong>${data.name}</strong><br>${data.addr}<br>📞 ${data.phone}</p>
+    </div>
+    ${productsLine}
+    ${courierLine}
+    <div class="label-footer">
+      ${codBox}
+      <div style="text-align:right;flex:1">
+        <svg id="${barcodeId}" style="max-width:200px;width:100%"></svg>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildSlipHTML(data) {
+  const isCOD = data.payMode === 'COD';
+  return `
+  <div class="return-slip">
+    <div class="return-slip-head">রিটার্ন স্লিপ (Return Slip)</div>
+    <div class="return-row">
+      <div>
+        <p style="margin:2px 0;font-size:0.88rem"><strong>অর্ডার নং:</strong> ${data.orderId}</p>
+        <p style="margin:2px 0;font-size:0.88rem"><strong>তারিখ:</strong> ____/____/২০___</p>
+        <p style="margin:2px 0;font-size:0.82rem;color:#666">${data.name} · ${data.phone}</p>
+      </div>
+      ${isCOD ? `<div class="return-amount"><span style="font-size:0.62rem;display:block">AMOUNT</span><strong>৳${data.amount}</strong></div>` : '<div class="return-amount"><span style="font-size:0.62rem;display:block">PAYMENT</span><strong style="color:#27ae60">PAID</strong></div>'}
+    </div>
+    <div class="return-reason">রিটার্নের কারণ: _______________________________________________</div>
+    <div class="return-footer">
+      <span>প্যাকিং চেক: _________</span>
+      <span>ডেলিভারি কোম্পানি: ${data.courierName || '____________'}</span>
+      <span>স্বাক্ষর: _________</span>
+    </div>
+  </div>`;
+}
+
+function getFormData() {
+  return {
+    name:     document.getElementById('custName').value    || 'ক্রেতার নাম',
+    phone:    document.getElementById('custPhone').value   || '01XXXXXXXXX',
+    addr:     document.getElementById('custAddr').value    || 'ঠিকানা',
+    orderId:  document.getElementById('orderID').value     || 'MC-0000',
+    payMode:  document.getElementById('payMode').value,
+    amount:   document.getElementById('totalAmount').value || '0',
+    courierName:     document.getElementById('courierName').value,
+    courierTracking: document.getElementById('courierTracking').value,
+    products: document.getElementById('productsList').value.trim(),
+  };
+}
+
+function renderBarcodes() {
+  document.querySelectorAll('[id^="barcode-"]').forEach(el => {
+    const val = el.closest('.label-card')?.querySelector('.brand-name')?.closest('.label-card');
+    // Use order id from the slip nearby
+    const slipId = el.id.replace('barcode-','');
+    try {
+      JsBarcode('#' + el.id, barcodeValues[slipId] || 'MC-0000', {
+        format:'CODE128', width:1.5, height:38, displayValue:true, fontSize:11,
+      });
+    } catch(e) {}
+  });
+}
+
+let barcodeValues = {};
+
+function renderSingleLabel(data) {
+  const panel = document.getElementById('previewPanel');
+  barcodeValues = { '0': data.orderId };
+  panel.innerHTML = `
+    <div class="label-wrap">
+      ${buildLabelHTML(data, 0)}
+      ${buildSlipHTML(data)}
+    </div>`;
+  setTimeout(() => {
+    try { JsBarcode('#barcode-0', data.orderId, { format:'CODE128', width:1.5, height:38, displayValue:true, fontSize:11 }); } catch(e) {}
+  }, 100);
+}
+
+function update() {
+  const data = getFormData();
+  document.getElementById('amountGroup').style.display = data.payMode === 'COD' ? 'block' : 'none';
+  renderSingleLabel(data);
+}
+
+// ════════════════════════════════════════════════
+// PRINT
+// ════════════════════════════════════════════════
+function printSingle() { window.print(); }
+
+function printMultiple() {
+  if (!selectedOrders.length) { showToast('কোনো অর্ডার select করা হয়নি!'); return; }
+
+  const panel = document.getElementById('previewPanel');
+  barcodeValues = {};
+  let html = '';
+
+  selectedOrders.forEach((orderId, i) => {
+    const o = allOrders.find(x => x.order_id === orderId);
+    if (!o) return;
+
+    // Build items text
+    let productsText = '';
+    try {
+      const items = typeof o.items_json === 'string' ? JSON.parse(o.items_json) : (o.items_json||[]);
+      productsText = items.map(item => {
+        const prod = allProducts.find(p => String(p.id) === String(item.id));
+        return (prod?.name || `#${item.id}`) + ' ×' + item.qty;
+      }).join('\n');
+    } catch(e) {}
+
+    const data = {
+      name:     o.name    || '',
+      phone:    o.phone   || '',
+      addr:     o.address || '',
+      orderId:  o.order_id,
+      payMode:  o.payment === 'ক্যাশ অন ডেলিভারি' ? 'COD' : 'PAID',
+      amount:   o.total   || '0',
+      courierName:     o.courier_name     || '',
+      courierTracking: o.courier_tracking || '',
+      products: productsText,
+    };
+    barcodeValues[String(i)] = orderId;
+    html += `<div class="label-wrap ${i < selectedOrders.length-1 ? 'page-break-after' : ''}">${buildLabelHTML(data, i)}${buildSlipHTML(data)}</div>`;
+  });
+
+  panel.innerHTML = html;
+
+  setTimeout(() => {
+    selectedOrders.forEach((orderId, i) => {
+      try { JsBarcode(`#barcode-${i}`, orderId, { format:'CODE128', width:1.5, height:38, displayValue:true, fontSize:11 }); } catch(e) {}
+    });
+    setTimeout(() => window.print(), 400);
+  }, 300);
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Init
+update();
+</script>
 </body>
 </html>
