@@ -12,7 +12,7 @@
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--earth); min-height:100vh; }
-
+ 
 /* ── LOGIN ── */
 #loginScreen {
   min-height:100vh; display:flex; align-items:center; justify-content:center;
@@ -38,7 +38,7 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
 }
 .login-btn:hover{ background:var(--clay-dark); }
 .login-error{ color:#c0392b; font-size:0.85rem; margin-top:0.5rem; display:none; }
-
+ 
 /* ── MAIN LAYOUT ── */
 #adminApp{ display:none; }
 .admin-header {
@@ -55,9 +55,9 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
   font-family:'Hind Siliguri',sans-serif; font-size:0.85rem; transition:background 0.2s;
 }
 .logout-btn:hover{ background:rgba(255,255,255,0.25); }
-
+ 
 .admin-body{ display:grid; grid-template-columns:220px 1fr; min-height:calc(100vh - 60px); }
-
+ 
 /* ── SIDEBAR ── */
 .sidebar{ background:white; border-right:1px solid var(--clay-light); padding:1.2rem 0; }
 .sidebar-item {
@@ -72,12 +72,12 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
   margin-left:auto; background:var(--clay); color:white;
   font-size:0.7rem; font-weight:700; padding:2px 7px; border-radius:10px;
 }
-
+ 
 /* ── CONTENT ── */
 .content{ padding:1.5rem; overflow-x:hidden; }
 .admin-section{ display:none; }
 .admin-section.active{ display:block; }
-
+ 
 /* ── STAT CARDS ── */
 .stat-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem; margin-bottom:1.5rem; }
 .stat-card{ background:white; border-radius:14px; padding:1.2rem; box-shadow:0 2px 8px rgba(61,35,20,0.07); }
@@ -86,7 +86,7 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
 .stat-value{ font-size:1.6rem; font-weight:700; color:var(--earth); }
 .stat-value.green{ color:var(--sage); }
 .stat-value.clay{ color:var(--clay); }
-
+ 
 /* ── FILTER BAR ── */
 .filter-bar{ display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:1rem; align-items:center; }
 .filter-bar input, .filter-bar select {
@@ -101,7 +101,7 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
   font-size:0.88rem; font-weight:700; transition:background 0.2s;
 }
 .refresh-btn:hover{ background:var(--clay-dark); }
-
+ 
 /* ── ORDER TABLE ── */
 .orders-table{ width:100%; border-collapse:collapse; background:white; border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(61,35,20,0.07); }
 .orders-table th{ background:var(--earth); color:white; padding:10px 12px; font-size:0.8rem; text-align:left; font-weight:700; }
@@ -117,7 +117,7 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
 }
 .edit-btn{ background:var(--clay-light); color:var(--clay-dark); }
 .edit-btn:hover{ background:var(--clay); color:white; }
-
+ 
 /* ── ORDER DETAIL MODAL ── */
 .modal-bg {
   display:none; position:fixed; inset:0; background:rgba(61,35,20,0.55);
@@ -161,7 +161,7 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
 }
 .save-btn:hover{ background:#5d6e52; }
 .save-btn:disabled{ background:#aaa; cursor:not-allowed; }
-
+ 
 /* ── TOAST ── */
 .toast {
   position:fixed; bottom:1.5rem; right:1.5rem; background:var(--earth); color:white;
@@ -169,10 +169,10 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
   transform:translateY(80px); opacity:0; transition:all 0.3s; z-index:9999;
 }
 .toast.show{ transform:translateY(0); opacity:1; }
-
+ 
 /* ── LOADING ── */
 .loading{ text-align:center; padding:3rem; color:#7a5a45; font-size:1rem; }
-
+ 
 @media(max-width:700px){
   .admin-body{ grid-template-columns:1fr; }
   .sidebar{ display:flex; overflow-x:auto; padding:0; border-right:none; border-bottom:1px solid var(--clay-light); }
@@ -184,7 +184,7 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
 </style>
 </head>
 <body>
-
+ 
 <!-- ═══ LOGIN ═══ -->
 <div id="loginScreen">
   <div class="login-box">
@@ -197,7 +197,7 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
     <div class="login-error" id="loginError">❌ ভুল পাসওয়ার্ড!</div>
   </div>
 </div>
-
+ 
 <!-- ═══ ADMIN APP ═══ -->
 <div id="adminApp">
   <div class="admin-header">
@@ -215,7 +215,7 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
       <button class="logout-btn" onclick="doLogout()">🚪 বের হন</button>
     </div>
   </div>
-
+ 
   <div class="admin-body">
     <!-- Sidebar -->
     <div class="sidebar">
@@ -227,10 +227,10 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
         <span class="sidebar-badge" id="newOrderBadge">0</span>
       </div>
     </div>
-
+ 
     <!-- Content -->
     <div class="content">
-
+ 
       <!-- Dashboard -->
       <div class="admin-section active" id="sec-dashboard">
         <div class="stat-grid" id="statGrid">
@@ -239,7 +239,7 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
         <h3 style="font-size:1rem;font-weight:700;color:var(--clay-dark);margin-bottom:1rem">🆕 সর্বশেষ ৫টি অর্ডার</h3>
         <div id="recentOrders"><div class="loading">⏳ লোড হচ্ছে...</div></div>
       </div>
-
+ 
       <!-- All Orders -->
       <div class="admin-section" id="sec-orders">
         <div class="filter-bar">
@@ -260,7 +260,7 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
     </div>
   </div>
 </div>
-
+ 
 <!-- ═══ ORDER DETAIL MODAL ═══ -->
 <div class="modal-bg" id="orderModal" onclick="closeModalOutside(event)">
   <div class="modal-box">
@@ -271,40 +271,41 @@ body{ font-family:'Hind Siliguri',sans-serif; background:#f0ebe4; color:var(--ea
     <div class="modal-body" id="modalBody"></div>
   </div>
 </div>
-
+ 
 <div class="toast" id="toast"></div>
-
+ 
 <script>
 // ════════════════════════════════════════════════
 // CONFIG — আপনার Apps Script URL এখানে দিন
 // ════════════════════════════════════════════════
 const API_URL = 'https://script.google.com/macros/s/AKfycbwQrvwnV949tQ_aOv3lVjN4H1DOMz-nOTlLqLdTlitcFT7AsCv6NVeBORtdYj-3Ux5dNw/exec';
 const ADMIN_PASS_KEY = 'matirKothaAdminPass';
-
+ 
 // ── STATE ──
 let adminPass    = '';
 let allOrders    = [];
+let allProducts  = []; // cache for invoice name/price lookup
 let currentOrder = null;
-
+ 
 // ════════════════════════════════════════════════
 // REAL-TIME POLLING (every 20 seconds)
 // ════════════════════════════════════════════════
 let adminPollInterval = null;
 let lastOrderCount    = 0;
 let isPolling         = false;
-
+ 
 function startAdminPolling() {
   if (adminPollInterval) clearInterval(adminPollInterval);
   adminPollInterval = setInterval(silentRefresh, 20000);
   updatePollIndicator(true);
 }
-
+ 
 function stopAdminPolling() {
   clearInterval(adminPollInterval);
   adminPollInterval = null;
   updatePollIndicator(false);
 }
-
+ 
 async function silentRefresh() {
   if (isPolling) return;
   isPolling = true;
@@ -312,10 +313,10 @@ async function silentRefresh() {
     const res  = await fetch(`${API_URL}?action=adminGetOrders&pass=${encodeURIComponent(adminPass)}`);
     const data = await res.json();
     if (!data.success) { isPolling = false; return; }
-
+ 
     const newOrders = data.orders || [];
     const newCount  = newOrders.length;
-
+ 
     if (newCount > lastOrderCount && lastOrderCount > 0) {
       const diff = newCount - lastOrderCount;
       showAdminToast(`🔔 ${diff}টি নতুন অর্ডার এসেছে!`, 'new');
@@ -323,41 +324,41 @@ async function silentRefresh() {
     }
     lastOrderCount = newCount;
     allOrders = newOrders;
-
+ 
     // Update new order badge
     document.getElementById('newOrderBadge').textContent =
       newOrders.filter(o => o.status === 'নতুন').length;
-
+ 
     // Silently re-render active section
     const dashActive   = document.getElementById('sec-dashboard')?.classList.contains('active');
     const ordersActive = document.getElementById('sec-orders')?.classList.contains('active');
     if (ordersActive) renderOrdersTable();
     if (dashActive)   renderRecentOrders();
-
+ 
     // Always refresh stats (fixes আজকের অর্ডার/আয়)
     try {
       const sRes  = await fetch(`${API_URL}?action=adminGetStats&pass=${encodeURIComponent(adminPass)}`);
       const sData = await sRes.json();
       if (sData.success) renderStats(sData.stats);
     } catch(e) {}
-
+ 
     updateLastSyncTime();
   } catch(e) {}
   isPolling = false;
 }
-
+ 
 function updatePollIndicator(active) {
   const dot = document.getElementById('pollDot');
   if (dot) { dot.style.background = active ? '#27ae60' : '#aaa'; }
   const lbl = document.getElementById('pollLabel');
   if (lbl) lbl.textContent = active ? 'Live' : 'Paused';
 }
-
+ 
 function updateLastSyncTime() {
   const el = document.getElementById('lastSync');
   if (el) el.textContent = new Date().toLocaleTimeString('bn-BD');
 }
-
+ 
 function playNotifSound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -371,7 +372,7 @@ function playNotifSound() {
     osc.start(); osc.stop(ctx.currentTime + 0.5);
   } catch(e) {}
 }
-
+ 
 function showAdminToast(msg, type) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -379,7 +380,7 @@ function showAdminToast(msg, type) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 4000);
 }
-
+ 
 const STATUS_COLORS = {
   'নতুন':           { bg:'#e8f4fd', color:'#2980b9' },
   'নিশ্চিত':        { bg:'#eaf0d8', color:'#5d6e52' },
@@ -388,7 +389,7 @@ const STATUS_COLORS = {
   'সম্পন্ন':        { bg:'#d8f5e8', color:'#27ae60' },
   'বাতিল':          { bg:'#fde8e8', color:'#c0392b' },
 };
-
+ 
 // ════════════════════════════════════════════════
 // AUTH
 // ════════════════════════════════════════════════
@@ -406,6 +407,11 @@ function doLogin() {
         document.getElementById('adminApp').style.display = 'block';
         allOrders = data.orders || [];
         lastOrderCount = allOrders.length;
+        // Load products for invoice name/price lookup
+        fetch(`${API_URL}?action=getProducts`)
+          .then(r => r.json())
+          .then(d => { if (d.success) allProducts = d.products || []; })
+          .catch(() => {});
         loadDashboard();
         renderOrdersTable();
         startAdminPolling(); // ← start real-time
@@ -419,7 +425,7 @@ function doLogin() {
       document.getElementById('loginError').textContent = '❌ সংযোগ সমস্যা হয়েছে!';
     });
 }
-
+ 
 function doLogout() {
   stopAdminPolling();
   sessionStorage.removeItem(ADMIN_PASS_KEY);
@@ -429,7 +435,7 @@ function doLogout() {
   document.getElementById('passInput').value = '';
   document.getElementById('loginError').style.display = 'none';
 }
-
+ 
 // Auto-login if session exists
 window.addEventListener('load', () => {
   const saved = sessionStorage.getItem(ADMIN_PASS_KEY);
@@ -438,7 +444,7 @@ window.addEventListener('load', () => {
     doLogin();
   }
 });
-
+ 
 // ════════════════════════════════════════════════
 // NAVIGATION
 // ════════════════════════════════════════════════
@@ -449,7 +455,7 @@ function showSection(name) {
   event.currentTarget.classList.add('active');
   if (name === 'orders') loadOrders();
 }
-
+ 
 // ════════════════════════════════════════════════
 // DASHBOARD
 // ════════════════════════════════════════════════
@@ -460,11 +466,11 @@ async function loadDashboard() {
     const data = await res.json();
     if (data.success) renderStats(data.stats);
   } catch(e) {}
-
+ 
   // Recent orders
   renderRecentOrders();
 }
-
+ 
 function renderStats(s) {
   const newCount = s.statusCount?.['নতুন'] || 0;
   document.getElementById('newOrderBadge').textContent = newCount;
@@ -479,13 +485,13 @@ function renderStats(s) {
     }).join('')}
   `;
 }
-
+ 
 function renderRecentOrders() {
   const recent = allOrders.slice(0, 5);
   if (!recent.length) { document.getElementById('recentOrders').innerHTML = '<p style="color:#7a5a45;font-size:0.9rem">কোনো অর্ডার নেই।</p>'; return; }
   document.getElementById('recentOrders').innerHTML = buildTable(recent);
 }
-
+ 
 // ════════════════════════════════════════════════
 // ORDERS
 // ════════════════════════════════════════════════
@@ -504,7 +510,7 @@ async function loadOrders() {
     document.getElementById('ordersTableWrap').innerHTML = '<div class="loading">❌ সংযোগ সমস্যা হয়েছে।</div>';
   }
 }
-
+ 
 function filterOrders() {
   const q      = document.getElementById('orderSearch').value.toLowerCase();
   const status = document.getElementById('statusFilter').value;
@@ -515,7 +521,7 @@ function filterOrders() {
   });
   renderOrdersTable(filtered);
 }
-
+ 
 function renderOrdersTable(orders) {
   const list = orders || allOrders;
   if (!list.length) {
@@ -524,7 +530,7 @@ function renderOrdersTable(orders) {
   }
   document.getElementById('ordersTableWrap').innerHTML = buildTable(list);
 }
-
+ 
 function buildTable(orders) {
   return `<div style="overflow-x:auto">
   <table class="orders-table">
@@ -553,7 +559,7 @@ function buildTable(orders) {
     </tbody>
   </table></div>`;
 }
-
+ 
 // ════════════════════════════════════════════════
 // ORDER DETAIL MODAL
 // ════════════════════════════════════════════════
@@ -562,14 +568,14 @@ function openOrderModal(orderJson) {
   currentOrder = o;
   document.getElementById('modalOrderId').textContent = '📦 ' + (o.order_id || '');
   const sc = STATUS_COLORS[o.status] || {bg:'#eee',color:'#333'};
-
+ 
   // Parse items
   let itemsText = '';
   try {
     const items = typeof o.items_json === 'string' ? JSON.parse(o.items_json) : (o.items_json || []);
     itemsText = items.map(i => `id:${i.id} × ${i.qty}`).join(', ');
   } catch(e) { itemsText = String(o.items_json || ''); }
-
+ 
   document.getElementById('modalBody').innerHTML = `
     <!-- Order info -->
     <div class="detail-row"><span class="detail-label">তারিখ</span><span class="detail-value">${o.date||''}</span></div>
@@ -582,7 +588,7 @@ function openOrderModal(orderJson) {
     <div class="detail-row"><span class="detail-label">মোট</span><span class="detail-value" style="color:var(--clay);font-size:1rem">৳${o.total||0}</span></div>
     ${o.note ? `<div class="detail-row"><span class="detail-label">নোট</span><span class="detail-value">${o.note}</span></div>` : ''}
     <div class="detail-row"><span class="detail-label">বর্তমান স্ট্যাটাস</span><span class="detail-value"><span class="status-badge" style="background:${sc.bg};color:${sc.color}">${o.status||'নতুন'}</span></span></div>
-
+ 
     <!-- Update section -->
     <span class="section-label">🔄 স্ট্যাটাস আপডেট করুন</span>
     <select class="update-select" id="modalStatus">
@@ -590,23 +596,35 @@ function openOrderModal(orderJson) {
         `<option ${o.status===s?'selected':''}>${s}</option>`
       ).join('')}
     </select>
-
-    <span class="section-label">🚚 কুরিয়ার তথ্য</span>
-    <input class="update-input" id="modalCourierName" placeholder="কুরিয়ারের নাম (যেমন: Pathao, Redx)" value="${o.courier_name||''}">
+ 
+    <span class="section-label">🚚 কুরিয়ার সার্ভিস</span>
+    <select class="update-select" id="modalCourierName">
+      <option value="">-- কুরিয়ার সার্ভিস বেছে নিন --</option>
+      <option value="Pathao" ${o.courier_name==='Pathao'?'selected':''}>🟠 Pathao Courier</option>
+      <option value="Redx" ${o.courier_name==='Redx'?'selected':''}>🔴 Redx</option>
+      <option value="Steadfast" ${o.courier_name==='Steadfast'?'selected':''}>🟢 Steadfast Courier</option>
+      <option value="eCourier" ${o.courier_name==='eCourier'?'selected':''}>🔵 eCourier</option>
+      <option value="Sundarban" ${o.courier_name==='Sundarban'?'selected':''}>🟡 Sundarban Courier</option>
+      <option value="SA Paribahan" ${o.courier_name==='SA Paribahan'?'selected':''}>🚌 SA Paribahan</option>
+      <option value="Paperfly" ${o.courier_name==='Paperfly'?'selected':''}>✈️ Paperfly</option>
+      <option value="Janani" ${o.courier_name==='Janani'?'selected':''}>📦 Janani Express</option>
+      <option value="CG Logistics" ${o.courier_name==='CG Logistics'?'selected':''}>🏭 CG Logistics</option>
+      <option value="Other" ${(o.courier_name && !['Pathao','Redx','Steadfast','eCourier','Sundarban','SA Paribahan','Paperfly','Janani','CG Logistics'].includes(o.courier_name))?'selected':''}>অন্যান্য</option>
+    </select>
     <input class="update-input" id="modalCourierTracking" placeholder="ট্র্যাকিং নম্বর" value="${o.courier_tracking||''}">
-
+ 
     <button class="save-btn" id="saveOrderBtn" onclick="saveOrderUpdate()">💾 সংরক্ষণ করুন</button>
   `;
-
+ 
   document.getElementById('orderModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
+ 
 async function saveOrderUpdate() {
   if (!currentOrder) return;
   const btn = document.getElementById('saveOrderBtn');
   btn.disabled = true; btn.textContent = '⏳ সংরক্ষণ হচ্ছে...';
-
+ 
   const payload = {
     action:           'adminUpdateOrder',
     pass:             adminPass,
@@ -615,7 +633,7 @@ async function saveOrderUpdate() {
     courierName:      document.getElementById('modalCourierName').value.trim(),
     courierTracking:  document.getElementById('modalCourierTracking').value.trim(),
   };
-
+ 
   try {
     const res  = await fetch(API_URL, {
       method:'POST',
@@ -634,10 +652,10 @@ async function saveOrderUpdate() {
   } catch(e) {
     showToast('❌ সংযোগ সমস্যা হয়েছে!');
   }
-
+ 
   btn.disabled = false; btn.textContent = '💾 সংরক্ষণ করুন';
 }
-
+ 
 function closeModal() {
   document.getElementById('orderModal').classList.remove('open');
   document.body.style.overflow = '';
@@ -647,40 +665,43 @@ function closeModalOutside(e) {
   if (e.target === document.getElementById('orderModal')) closeModal();
 }
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
-
-
+ 
+ 
 // ════════════════════════════════════════════════
 // ── ADMIN INVOICE GENERATOR ──
 // ════════════════════════════════════════════════
 function adminGenerateInvoice(orderJson) {
   const o = JSON.parse(orderJson);
-
-  // Parse items
+ 
+  // Parse items — lookup name & price from cached products (loaded at login)
   let itemRows = '';
   let subtotalCalc = 0;
   try {
     const items = typeof o.items_json === 'string' ? JSON.parse(o.items_json) : (o.items_json || []);
     itemRows = items.map(i => {
-      // Find product name from allOrders context (id+qty only stored)
-      const lineTotal = (i.lineTotal || (i.price && i.price * i.qty) || 0);
-      subtotalCalc += lineTotal;
+      // Try to find product info from allProducts cache
+      const prod      = (allProducts || []).find(p => String(p.id) === String(i.id));
+      const name      = i.name  || prod?.name  || `পণ্য #${i.id}`;
+      const price     = i.price || prod?.price || 0;
+      const lineTotal = i.lineTotal || (price * i.qty) || 0;
+      subtotalCalc   += lineTotal;
       return `<tr>
-        <td style="padding:8px 12px;border-bottom:1px solid #f0e8de">${i.name || 'পণ্য id:'+i.id}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0e8de">${name}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #f0e8de;text-align:center">${i.qty}</td>
-        <td style="padding:8px 12px;border-bottom:1px solid #f0e8de;text-align:right">${i.price ? '৳'+i.price : '—'}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f0e8de;text-align:right">${price ? '৳'+price : '—'}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #f0e8de;text-align:right;font-weight:600">${lineTotal ? '৳'+lineTotal : '—'}</td>
       </tr>`;
     }).join('');
   } catch(e) {
     itemRows = `<tr><td colspan="4" style="padding:8px 12px;color:#7a5a45">${String(o.items_json||'')}</td></tr>`;
   }
-
+ 
   const subtotal = o.subtotal || subtotalCalc || o.total;
   const discount = o.discount || 0;
   const delivery = o.delivery || 0;
   const codFee   = o.cod_fee  || 0;
   const total    = o.total    || 0;
-
+ 
   const invoiceHTML = `<!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -768,11 +789,11 @@ function adminGenerateInvoice(orderJson) {
   </div>
 </div>
 </body></html>`;
-
+ 
   downloadAsPDF(invoiceHTML, `receipt-${o.order_id}.pdf`);
 }
-
-
+ 
+ 
 // ════════════════════════════════════════════════
 // ── PDF GENERATOR (Print-based — crisp quality) ──
 // ════════════════════════════════════════════════
@@ -790,20 +811,36 @@ function downloadAsPDF(htmlContent, filename) {
     '</body>',
     `<script>
       window.onload = function() {
-        document.title = '${filename.replace('.pdf','')}';
+        document.title = '` + filename.replace('.pdf','') + `';
         setTimeout(function() { window.print(); }, 600);
       };
     <\/script></body>`
   );
-
-  const win = window.open('', '_blank', 'width=900,height=700');
-  if (!win) { showToast('❌ Popup blocked!'); return; }
-  win.document.open();
-  win.document.write(printReady);
-  win.document.close();
-  showToast('✅ প্রিন্ট ডায়ালগ খুলছে — "Save as PDF" বেছে নিন');
+ 
+  // Use Blob URL — works even when popups are blocked
+  try {
+    const blob = new Blob([printReady], { type: 'text/html;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.target   = '_blank';
+    a.rel      = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    showToast('✅ রসিদ খুলছে — "Save as PDF" বেছে নিন');
+  } catch(e) {
+    // Fallback to window.open
+    const win = window.open('', '_blank', 'width=900,height=700');
+    if (!win) { showToast('❌ Popup blocked! Browser settings-এ allow করুন।'); return; }
+    win.document.open();
+    win.document.write(printReady);
+    win.document.close();
+    showToast('✅ প্রিন্ট ডায়ালগ খুলছে — "Save as PDF" বেছে নিন');
+  }
 }
-
+ 
 // ── TOAST ──
 function showToast(msg) {
   showAdminToast(msg, 'normal');
